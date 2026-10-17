@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Solo Mati y Marcelita pueden leer y escribir el álbum.
+    function esNuestro() {
+      return request.auth != null &&
+        request.auth.token.email in ['mati@nuestroalbum.app', 'marcelita@nuestroalbum.app'];
+    }
+    match /{document=**} {
+      allow read, write: if esNuestro();
+    }
+  }
+}
