@@ -221,6 +221,38 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 .card .art .lt{font-family:var(--pix);font-size:42cqw;line-height:1;color:#fff;text-shadow:4cqw 4cqw 0 #8a1f45,0 0 6cqw #fff8}
 .pxedit .art{touch-action:none;cursor:grab}
 .pxedit{width:min(250px,62vw)}
+/* índice tipo cartuchos */
+.coll{display:flex;flex-direction:column;gap:10px}
+.cpct{font-family:var(--pix);font-size:18px;color:var(--grn)}
+.rchips{display:flex;flex-wrap:wrap;gap:6px 12px}
+.rchips span{display:flex;align-items:center;gap:6px;font-size:17px;color:var(--mute)}
+.rchips i{width:10px;height:10px;background:var(--rc);display:block}
+.carts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px}
+@media (min-width:640px){.carts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:900px){.carts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.cart{position:relative;border:0;padding:6px 10px 10px;background:linear-gradient(180deg,#3d3768,#29244a);color:var(--ink);display:flex;flex-direction:column;gap:6px;text-align:left;min-width:0;
+  box-shadow:0 0 0 3px #4a4382,5px 5px 0 3px #0009}
+.cart::before,.cart::after{content:"";position:absolute;top:-3px;width:12px;height:12px;background:var(--bg)}
+.cart::before{left:-3px}.cart::after{right:-3px}
+.cart:active{transform:translate(2px,3px);box-shadow:0 0 0 3px #4a4382,2px 2px 0 3px #0009}
+.cridge{height:9px;margin:0 10px 2px;background:repeating-linear-gradient(90deg,#00000055 0 3px,transparent 3px 7px)}
+.clabel{position:relative;aspect-ratio:1/1;max-width:100%;background:var(--pc);box-shadow:inset 0 0 0 3px #0000002e,inset 0 -26px 0 #00000022;display:flex;align-items:flex-end;justify-content:center;padding:8px 8px 10px;overflow:hidden}
+.clabel::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#ffffff10 0 2px,transparent 2px 6px);pointer-events:none}
+.cthumbs{display:flex;gap:5px;width:100%;justify-content:center;align-items:flex-end}
+.cthumbs i{flex:0 0 29%;aspect-ratio:5/7;background:#0c0a1a center/cover no-repeat;image-rendering:pixelated;box-shadow:0 0 0 2px #000000a0,3px 3px 0 1px #00000055;display:flex;align-items:center;justify-content:center;font-style:normal}
+.cthumbs i:nth-child(2){flex-basis:34%;margin-bottom:6px}
+.cthumbs i.q{background:repeating-conic-gradient(#2e2853 0 25%,#231e41 0 50%) 0 0/8px 8px;font-family:var(--pix);font-size:11px;color:#ffffff66}
+.cthumbs i.ltt{background:radial-gradient(circle,#ff8fb0,#ff4f7b 55%,#8a1f45)}
+.cthumbs i.ltt b{font-family:var(--pix);font-weight:400;font-size:clamp(12px,5vw,22px);color:#fff;text-shadow:2px 2px 0 #8a1f45}
+.cnum{position:absolute;top:6px;left:6px;z-index:2;background:#000000a0;color:#fff;font-family:var(--pix);font-size:8px;padding:4px 5px}
+.cstamp{position:absolute;top:7px;right:5px;z-index:2;background:var(--yel);color:#1a1300;font-family:var(--pix);font-size:6.5px;padding:4px 5px;transform:rotate(6deg);box-shadow:2px 2px 0 #0008}
+.ctitle{font-size:20px;line-height:.95;min-height:1.9em;display:flex;align-items:flex-end;text-wrap:balance;margin-top:2px}
+.cwho{font-size:15px;line-height:1;color:var(--mute)}
+.cfoot{display:flex;align-items:center;gap:8px;margin-top:2px}
+.cbar{flex:1;height:8px;background:#0f0c1f;box-shadow:0 0 0 2px #4a4382;position:relative;overflow:hidden}
+.cbar i{position:absolute;inset:0 auto 0 0;background:var(--pc)}
+.ccount{font-family:var(--pix);font-size:8px;color:var(--ink)}
+.cart.done{box-shadow:0 0 0 3px var(--yel),5px 5px 0 3px #0009}
 /* índice de secciones */
 .idx{display:grid;gap:12px}
 @media (min-width:640px){.idx{grid-template-columns:1fr 1fr}}
@@ -531,14 +563,27 @@ function safeRender(){renderTitle();if(!$('ov').hidden){dirty=true;hdr();return;
 /* ===== Vista: Álbum ===== */
 function vAlbum(){return sec<0?vIndex():vSection();}
 function vIndex(){
-  const tot=uniq(me),N=CARDS.length;
+  const tot=uniq(me),N=CARDS.length,order={M:0,L:1,B:2,R:3,C:4};
+  const thumb=c=>{if(!c)return '<i class="q">?</i>';const im=cimg(c);
+    if(!im&&c.lt)return `<i class="ltt"><b>${esc(c.lt)}</b></i>`;
+    return `<i style="background-image:url('${im||sprite(c)}')${im?'':';background-size:70% auto;background-color:color-mix(in srgb,'+SECTIONS[c.page].c+' 25%,#0c0a1a)'}"></i>`;};
   return `<div class="sec">
-  <div class="box"><div class="lbl">Tu colección</div><div class="row" style="margin-top:8px"><div class="big">${tot}<span class="muted" style="font-size:22px">/${N}</span></div>
-    <div style="flex:1;min-width:120px"><div class="prog"><i style="width:${tot/N*100}%"></i></div></div></div></div>
-  <div class="idx">${SECTIONS.map((x,i)=>{const n=SC(i).length,d=pageDone(me,i);return `<button class="sx${d===n?' done':''}" data-sec="${i}" style="--pc:${x.c}">
-    <span class="sxn">${String(i+1).padStart(2,'0')}</span>
-    <span class="sxb"><span class="sxt">${esc(x.t)}</span><span class="sxw">${esc(x.who)}${d===n?' · ¡COMPLETA!':''}</span><span class="prog"><i style="width:${d/n*100}%"></i></span></span>
-    <span class="sxc">${d}/${n}</span></button>`}).join('')}</div>
+  <div class="box coll">
+    <div class="row" style="align-items:flex-end"><div style="flex:1;min-width:0"><div class="lbl">Tu colección</div><div class="big">${tot}<span class="muted" style="font-size:22px">/${N}</span></div></div>
+      <div class="cpct">${Math.round(tot/N*100)}%</div></div>
+    <div class="prog"><i style="width:${tot/N*100}%"></i></div>
+    <div class="rchips">${['C','R','B','L','M'].map(k=>`<span style="--rc:var(--c-${k})"><i></i>${RAR[k].n} ${BYR[k].filter(c=>cnt(me,c.id)).length}/${BYR[k].length}</span>`).join('')}</div>
+  </div>
+  <div class="carts">${SECTIONS.map((x,i)=>{const cs=SC(i),n=cs.length,d=pageDone(me,i),full=d===n;
+    const best=cs.filter(c=>cnt(me,c.id)).sort((a,b)=>order[a.r]-order[b.r]).slice(0,3);
+    const th=[best[1],best[0],best[2]].map(thumb).join('');
+    return `<button class="cart${full?' done':''}" data-sec="${i}" style="--pc:${x.c}">
+      <span class="cridge" aria-hidden="true"></span>
+      <span class="clabel"><span class="cnum">${String(i+1).padStart(2,'0')}</span>${full?'<span class="cstamp">★ COMPLETA</span>':''}<span class="cthumbs">${th}</span></span>
+      <span class="ctitle">${esc(x.t)}</span>
+      <span class="cwho">${esc(x.who)}</span>
+      <span class="cfoot"><span class="cbar"><i style="width:${d/n*100}%"></i></span><span class="ccount">${d}/${n}</span></span>
+    </button>`;}).join('')}</div>
   </div>`;
 }
 function vSection(){
@@ -921,7 +966,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='10';
+const APP_VERSION='11';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
