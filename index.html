@@ -649,7 +649,7 @@ function vTaller(){
     <div style="margin-top:10px">${S.codes.length?S.codes.map(c=>`<div class="row" style="justify-content:space-between"><span class="pix" style="font-size:12px;color:${c.used?'var(--mute)':'var(--yel)'}">${esc(c.id)}</span><span class="muted">${c.packs} sobre${c.packs>1?'s':''} · ${c.used?'usado':'sin usar'}</span></div>`).join(''):'<p class="empty">Todavía no hay códigos.</p>'}</div></div>
   <div class="box"><div class="lbl">Zona de peligro</div><p class="muted">Borra el progreso de los dos y los cambios. Los nombres y fotos de las láminas se mantienen.</p>
     <button class="btn red sm" id="reset">${resetArm?'¿SEGURO? TOCA DE NUEVO':'REINICIAR PROGRESO'}</button></div>
-  <div class="box row"><div class="grow muted">Sesión iniciada como ${esc(nm(realMe))}</div><button class="btn ghost sm" id="logout">CERRAR SESIÓN</button></div>
+  <div class="box row"><div class="grow muted">Sesión iniciada como ${esc(nm(realMe))} · Versión ${APP_VERSION}</div><button class="btn ghost sm" id="logout">CERRAR SESIÓN</button></div>
   </div>`;
 }
 
@@ -843,7 +843,12 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+const APP_VERSION='6';
+if('serviceWorker' in navigator){
+  const had=!!navigator.serviceWorker.controller;let reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();setInterval(()=>r.update(),30*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)r.update();});}).catch(()=>{}));
+}
 </script>
 </body>
 </html>

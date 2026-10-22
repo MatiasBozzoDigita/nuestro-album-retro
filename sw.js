@@ -1,5 +1,5 @@
 // Service worker: la app abre aunque la conexión esté lenta, y siempre busca la versión nueva primero.
-const CACHE = 'album-v5';
+const CACHE = 'album-v6';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -16,7 +16,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // Firebase y fuentes van directo a la red
   e.respondWith(
-    fetch(req).then(res => {
+    fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }).then(res => {
       const copy = res.clone();
       caches.open(CACHE).then(c => c.put(req, copy));
       return res;
