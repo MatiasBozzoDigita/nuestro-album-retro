@@ -489,8 +489,8 @@ function sprite(c){
 }
 
 /* ===== Lámina ===== */
-function cardHTML(c,count=0){
-  const img=cimg(c),hol=c.r==='B'||c.r==='L'||c.r==='M';
+function cardHTML(c,count=0,ovImg){
+  const img=ovImg||cimg(c),hol=c.r==='B'||c.r==='L'||c.r==='M';
   return `<div class="card${hol?' holo':''}${c.r==='L'||c.r==='M'?' lg':''}${c.r==='M'?' my':''}" style="--pc:${PAGES[c.page].c};--rc:var(--c-${c.r})">
     <div class="top"><span>#${String(c.num).padStart(3,'0')}</span><span>${RAR[c.r].s}</span></div>
     <div class="art${img?'':c.lt?' ltr':' spr'}" style="${img?`background-image:url('${img}')`:c.lt?'':`background-image:url('${sprite(c)}')`}">${!img&&c.lt?`<span class="lt">${esc(c.lt)}</span>`:''}${hol?'<div class="shine"></div>':''}</div>
@@ -755,13 +755,52 @@ async function doReset(){
     for(const t of S.trades)await deleteDoc(doc(fs,'trades',t.id));toast('Progreso reiniciado');}catch(e){toast('No se pudo reiniciar');}
 }
 /* Fotos: se comprimen en el celular (máx. 400 px de ancho) y se guardan en la base de datos */
-function compress(file){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>{
-  const W=400,H=560,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
-  const s=Math.max(W/img.width,H/img.height),w=img.width*s,h=img.height*s;g.drawImage(img,(W-w)/2,(H-h)/2,w,h);
-  URL.revokeObjectURL(img.src);res(cv.toDataURL('image/jpeg',.78));};img.onerror=rej;img.src=URL.createObjectURL(file);});}
+/* ===== Fotos: filtro pixel 8-bit con vista previa ===== */
+const PXPAL=['000000','1d2b53','7e2553','008751','ab5236','5f574f','c2c3c7','fff1e8','ff004d','ffa300','ffec27','00e436','29adff','83769c','ff77a8','ffccaa',
+  '291814','111d35','422136','125359','742f29','49333b','a28879','f3ef7d','be1250','ff6c24','a8e72e','00b543','065ab5','754665','ff6e59','ff9d81']
+  .map(h=>[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]);
+const PXDET={bajo:40,medio:56,alto:76};
+let pxOn=true,pxDet='medio';
+try{pxOn=localStorage.getItem('alb_px')!=='0';pxDet=localStorage.getItem('alb_pxd')||'medio';if(!PXDET[pxDet])pxDet='medio';}catch(e){}
+function loadImg(file){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=rej;img.src=URL.createObjectURL(file);});}
+function coverDraw(g,img,W,H){const s=Math.max(W/img.width,H/img.height),w=img.width*s,h=img.height*s;g.drawImage(img,(W-w)/2,(H-h)/2,w,h);}
+function photoURL(img){const cv=document.createElement('canvas');cv.width=400;cv.height=560;coverDraw(cv.getContext('2d'),img,400,560);return cv.toDataURL('image/jpeg',.78);}
+function pixelURL(img,W){
+  const H=Math.round(W*7/5),sm=document.createElement('canvas');sm.width=W;sm.height=H;
+  const g=sm.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';coverDraw(g,img,W,H);
+  const id=g.getImageData(0,0,W,H),d=id.data,BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=(y*W+x)*4;let r=d[i],gr=d[i+1],b=d[i+2];
+    const l=(r+gr+b)/3;r=l+(r-l)*1.25;gr=l+(gr-l)*1.25;b=l+(b-l)*1.25;
+    r=(r-128)*1.12+128;gr=(gr-128)*1.12+128;b=(b-128)*1.12+128;
+    const t=(BY[(y&3)*4+(x&3)]/16-.47)*22;r+=t;gr+=t;b+=t;
+    let best=0,bd=1e12;for(let k=0;k<PXPAL.length;k++){const q=PXPAL[k],dr=r-q[0],dg=gr-q[1],db=b-q[2],dd=2*dr*dr+4*dg*dg+3*db*db;if(dd<bd){bd=dd;best=k;}}
+    d[i]=PXPAL[best][0];d[i+1]=PXPAL[best][1];d[i+2]=PXPAL[best][2];d[i+3]=255;}
+  g.putImageData(id,0,0);
+  const k=Math.ceil(400/W),big=document.createElement('canvas');big.width=W*k;big.height=H*k;const bg=big.getContext('2d');bg.imageSmoothingEnabled=false;bg.drawImage(sm,0,0,W*k,H*k);
+  return big.toDataURL('image/png');
+}
+let pend=null;
 async function upload(id,file){
-  if(!file)return;toast('Subiendo foto…');
-  try{const d=await compress(file);await setDoc(doc(fs,'cardimg',id),{d});toast('Foto lista');}catch(e){toast('No se pudo subir esa foto');}
+  if(!file)return;
+  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img};showPx();}catch(e){toast('No se pudo abrir esa foto');}
+}
+function showPx(){
+  if(!pend)return;const c=CBY[pend.id];
+  pend.url=pxOn?pixelURL(pend.img,PXDET[pxDet]):photoURL(pend.img);
+  $('ov').hidden=false;document.body.classList.add('ov-open');
+  $('ovin').innerHTML=`<div class="ovtitle pix">VISTA PREVIA</div>
+    <div class="zoom">${cardHTML(c,0,pend.url)}</div>
+    <div class="box" style="width:100%;display:flex;flex-direction:column;gap:12px">
+      <div class="row"><span class="lbl" style="flex:1">Filtro pixel 8-bit</span><button class="btn sm ${pxOn?'':'ghost'}" id="pxtog">${pxOn?'ACTIVADO':'DESACTIVADO'}</button></div>
+      ${pxOn?`<div class="row"><span class="lbl" style="flex:1">Detalle</span>${Object.keys(PXDET).map(k=>`<button class="btn sm ${pxDet===k?'':'ghost'}" data-pxd="${k}">${k.toUpperCase()}</button>`).join('')}</div>`:''}
+    </div>
+    <div class="row"><button class="btn" id="pxsave">GUARDAR</button><button class="btn ghost" id="pxcancel">CANCELAR</button></div>`;
+  $('pxtog').onclick=()=>{pxOn=!pxOn;try{localStorage.setItem('alb_px',pxOn?'1':'0')}catch(e){}sfx.blip();showPx();};
+  $('ovin').querySelectorAll('[data-pxd]').forEach(b=>b.onclick=()=>{pxDet=b.dataset.pxd;try{localStorage.setItem('alb_pxd',pxDet)}catch(e){}sfx.blip();showPx();});
+  $('pxcancel').onclick=()=>{URL.revokeObjectURL(pend.img.src);pend=null;closeOv();};
+  $('pxsave').onclick=async()=>{const b=$('pxsave');b.disabled=true;b.textContent='GUARDANDO…';const {id,url}=pend;
+    try{await setDoc(doc(fs,'cardimg',id),{d:url});URL.revokeObjectURL(pend.img.src);pend=null;closeOv();sfx.ok();toast('Foto lista');}
+    catch(e){b.disabled=false;b.textContent='GUARDAR';toast('No se pudo guardar. Revisa tu conexión.');}};
 }
 
 /* ===== Eventos ===== */
@@ -788,7 +827,7 @@ function bind(){
   const ci=$('capin');if(ci)ci.oninput=()=>debounced('cap',()=>patchCfg({packCap:Math.max(1,Math.min(20,+ci.value||4))}));
   const tp=$('tpage');if(tp)tp.onchange=()=>{tallerPage=+tp.value;render();};
   m.querySelectorAll('[data-cn]').forEach(i=>i.oninput=()=>debounced('cn'+i.dataset.cn,()=>patchCfg({cards:{[i.dataset.cn]:{name:i.value.trim()}}})));
-  m.querySelectorAll('[data-up]').forEach(i=>i.onchange=()=>upload(i.dataset.up,i.files[0]));
+  m.querySelectorAll('[data-up]').forEach(i=>i.onchange=()=>{const f=i.files[0];i.value='';upload(i.dataset.up,f);});
 }
 
 
@@ -847,7 +886,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='8';
+const APP_VERSION='9';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
