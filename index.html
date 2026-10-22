@@ -54,6 +54,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:va
 .hd h1 small{display:block;font-family:var(--body);font-size:18px;color:var(--mute);letter-spacing:0}
 .chip{font-family:var(--pix);font-size:9px;padding:7px 8px;background:var(--panel2);box-shadow:0 0 0 2px var(--line);white-space:nowrap}
 .chip b{color:var(--yel);font-weight:400}
+.iconbtn.off{opacity:.35;text-decoration:line-through}
 .iconbtn{background:var(--panel2);border:0;box-shadow:0 0 0 2px var(--line);padding:6px 8px;font-family:var(--pix);font-size:9px}
 
 /* nav */
@@ -246,7 +247,7 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
   <div class="logo" aria-hidden="true"><i style="background:var(--red)"></i><i style="background:var(--yel)"></i><i style="background:var(--grn)"></i><i style="background:var(--blu)"></i></div>
   <h1>NUESTRO ÁLBUM RETRO<small id="hdsub">Cargando…</small></h1>
   <span class="chip" id="hdpacks">SOBRES <b>0</b></span>
-  <button class="iconbtn" id="mute" aria-label="Sonido">♪ ON</button>
+  <button class="iconbtn" id="music" aria-label="Música">♫</button><button class="iconbtn" id="mute" aria-label="Efectos de sonido">♪</button>
 </div></header>
 
 <div class="wrap"><main id="main"></main></div>
@@ -298,23 +299,23 @@ const SECTIONS=[
    ...R_('C','Falco','Peppy Hare','Arwing','Metroid','Ridley','King K. Rool','Cranky Kong','Waddle Dee','Jigglypuff','Charmander','Bulbasaur','Squirtle','Pokébola','Mewtwo','Olimar y Pikmin','Aldeano','Tom Nook','Inkling','Marth','Ike','R.O.B.','Mr. Game & Watch','Duck Hunt','Little Mac','Excitebike')]},
  {t:'Consolas y cartuchos',who:'De Mati',c:'#4377e0',k:[...R_('L','Nintendo 64','Super Nintendo'),...R_('B','NES','GameCube','Game Boy','Nintendo Switch'),
    ...R_('R','Wii','Game Boy Color','Game Boy Advance','Nintendo DS','Nintendo 3DS','Virtual Boy','Wii U','Game & Watch'),
-   ...R_('C','Control de NES','Control de SNES','Control de N64','Control de GameCube','Wiimote','Joy-Con','Pro Controller','Rumble Pak','Expansion Pak','Memory Card','Zapper','Wii Balance Board','Ocarina of Time','Super Mario 64','Mario Kart 64','Super Mario World','Donkey Kong Country','Pokémon Rojo','Smash Bros. Melee','GoldenEye 007','A Link to the Past','Super Metroid','Star Fox 64','Breath of the Wild')]},
+   ...R_('C','Control de NES','Control de SNES','Control de N64','Control de GameCube','Wiimote','Joy-Con','Pro Controller','Ocarina of Time','Super Mario 64','Mario Kart 64','Super Mario World','Donkey Kong Country','Pokémon Rojo','Smash Bros. Melee','GoldenEye 007','A Link to the Past','Super Metroid','Star Fox 64','Breath of the Wild')]},
  {t:'Dragones',who:'De los dos',c:'#a35bf0',k:[...R_('L','Gran Dragón'),...R_('B','Dragón oscuro'),...R_('R','Dragón de fuego','Dragón de hielo','Dragón nocturno'),
-   ...R_('C','Dragón de agua','Dragón de tierra','Dragón venenoso','Dragón de viento','Dragón eléctrico','Dragón de cristal','Dragón bebé')]},
+   ...R_('C','Dragón de agua','Dragón de tierra','Dragón venenoso')]},
  {t:'Comida',who:'De los dos',c:'#d9a521',k:[...R_('B','Completos'),...R_('R','Pizza','Hamburguesas','Tacos','Empanadas'),
-   ...R_('C','Papas fritas','Fajitas','Fideos','Lasaña','Carne asada','Cazuela de vacuno','Helados','Churros','Frutillas con chocolate','Sushi','Sopaipillas','Mote con huesillo','Pie de limón')]},
+   ...R_('C','Papas fritas','Fajitas','Fideos','Lasaña','Carne asada','Cazuela de vacuno','Helados','Churros','Frutillas con chocolate','Sopaipillas','Mote con huesillo','Pie de limón')]},
  {t:'Bandas y artistas',who:'De los dos',c:'#e0507a',k:[...R_('L','Pearl Jam'),...R_('B',"Guns N' Roses",'Metallica'),...R_('R','Linkin Park','Los Bunkers','Ricardo Arjona','Bad Bunny'),
    ...R_('C','Limp Bizkit','Chico Trujillo','Entremares','Amar Azul','Dread Mar I','Luis Miguel','Luis Fonsi','Cristian Castro','Mon Laferte')]},
- {t:'Fechas importantes',who:'De los dos',c:'#ff5fd2',k:R_('M','24 de agosto','29 de octubre','2 de noviembre')},
+ {t:'Fechas importantes',who:'De los dos',c:'#ff5fd2',k:R_('M','Cumpleaños de Mati','Cumpleaños de Marcelita','Nuestro aniversario')},
  {t:'Festividades',who:'De los dos',c:'#2bb3c0',k:[...R_('L','Navidad'),...R_('B','Fiestas Patrias'),...R_('R','Halloween','Año Nuevo','San Valentín'),
-   ...R_('C','Pascua de Resurrección','Día del Niño','Carnaval','We Tripantu','Noche de San Juan','Cumpleaños','Día de los Muertos','Día de la Madre','Día del Padre')]},
+   ...R_('C','Pascua de Resurrección','Carnaval','Cumpleaños','Día de los Muertos')]},
  {t:'Películas y series',who:'De los dos',c:'#7f6cf0',k:[...R_('B','Piratas del Caribe'),...R_('R','Shingeki no Kyojin','The Last Kingdom','Aladdín'),
    ...R_('C','El cuento de la criada','Rapunzel','Tinkerbell','Tarzán','Tierra de osos','Una noche en el museo')]},
- {t:'Gatos',who:'De los dos',c:'#e8a05c',k:[...R_('L','Rusia','Nino','Hades'),...R_('R','Los tres juntos','Siesta gatuna'),...R_('C','Travesura gatuna')]},
+ {t:'Gatos',who:'De los dos',c:'#e8a05c',k:[...R_('L','Rusia','Nino','Hades'),...R_('R','Los tres juntos')]},
  {t:'Personajes',who:'De los dos',c:'#5a8fd8',k:[...R_('B','Eren Jaeger','Jack Sparrow','Genio'),
    ...R_('R','Levi Ackerman','Mikasa Ackerman','Uhtred','Rapunzel','Flynn Rider','Aladdín','Kenai','Larry Daley'),
    ...R_('C','Armin Arlert','Titán Colosal','Rey Alfred','June Osborne','Will Turner','Elizabeth Swann','Capitán Barbossa','Davy Jones','Pascal','Tinkerbell','Tarzán','Jane Porter','Jasmín','Abú','Jafar','Koda','Teddy Roosevelt','Rexy','Dexter')]},
- {t:'Amigos',who:'De los dos',c:'#7cb83a',k:[...R_('B','La tropa completa'),...R_('R','Coni','Andrea','Jared','Cota'),...R_('C','Pinu','Nati','Fabi','Sam','Diego','Javi','Dani')]},
+ {t:'Amigos',who:'De los dos',c:'#7cb83a',k:[...R_('R','Coni','Andrea','Jared','Cota'),...R_('C','Pinu','Nati','Fabi','Sam','Diego','Javi','Dani')]},
  {t:'Panoramas',who:'De los dos',c:'#26a69a',k:[...R_('L','Familia de Legos'),...R_('B','Conciertos Piedra Negra'),...R_('R','Salida a Viña','Juegos inflables en Villarrica','Playa con los chiquillos'),
    ...R_('C','Fonda Doña Florinda','Salida nocturna en la Ñipa','Idas al cine','Creación de pixelarts')]},
  {t:'Favoritos de Marcelita',who:'De Marcelita',c:'#b866e8',k:[...R_('B','Hacer sentir bien a las personas'),...R_('R','Ir a la playa','Volleyball'),...R_('C','Dormir','Ir a la piscina')]},
@@ -323,7 +324,8 @@ const SECTIONS=[
 ];
 const PAGES=SECTIONS;
 const CARDS=[];
-SECTIONS.forEach((p,pi)=>p.k.forEach(([n,r])=>CARDS.push({id:'l'+String(CARDS.length+1).padStart(3,'0'),num:CARDS.length+1,page:pi,dn:n,r})));
+const kslug=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+SECTIONS.forEach((p,pi)=>p.k.forEach(([n,r])=>CARDS.push({id:kslug(p.t).slice(0,12)+'~'+kslug(n),num:CARDS.length+1,page:pi,dn:n,r})));
 const CBY=Object.fromEntries(CARDS.map(c=>[c.id,c]));
 const BYR={C:[],R:[],B:[],L:[],M:[]};CARDS.forEach(c=>BYR[c.r].push(c));
 const SCN=SECTIONS.map((_,i)=>CARDS.filter(c=>c.page===i));
@@ -357,11 +359,17 @@ const patchPlayer=(w,obj)=>q('p'+w,()=>setDoc(doc(fs,'players',w),obj,{merge:tru
 const patchCfg=obj=>q('cfg',()=>setDoc(doc(fs,'config','main'),obj,{merge:true}).catch(e=>{toast('No se pudo guardar el cambio.');console.warn(e);}));
 
 /* ===== Sonido 8-bit ===== */
-let AC=null,muted=false;
-try{muted=localStorage.getItem('alb_mute')==='1'}catch(e){}
-function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
-function tone(f,d,when=0,type='square',v=.05){if(muted)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;
-  const t=a.currentTime+when;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.02);}
+let AC=null,MG=null,SG=null,muted=false,musicOn=true;
+try{muted=localStorage.getItem('alb_mute')==='1';musicOn=localStorage.getItem('alb_music')!=='0'}catch(e){}
+function ac(){
+  if(!AC||AC.state==='closed'){try{AC=new (window.AudioContext||window.webkitAudioContext)();SG=AC.createGain();SG.gain.value=1;SG.connect(AC.destination);MG=AC.createGain();MG.gain.value=.55;MG.connect(AC.destination);}catch(e){AC=null}}
+  if(AC&&AC.state!=='running')AC.resume().catch(()=>{});
+  return AC;
+}
+function unlock(){const a=ac();if(!a)return;try{const b=a.createBuffer(1,1,22050),src=a.createBufferSource();src.buffer=b;src.connect(a.destination);src.start(0);}catch(e){}if(musicOn)Music.start();}
+['pointerdown','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,unlock,{passive:true}));
+function tone(f,d,when=0,type='square',v=.05,dest){if(dest==null&&muted)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;
+  const t=Math.max(a.currentTime,when>20?when:a.currentTime+.01+when);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(dest||SG);o.start(t);o.stop(t+d+.02);}
 const sfx={
   blip:()=>tone(880,.06),
   flip:()=>{tone(523,.05);tone(784,.06,.05)},
@@ -372,7 +380,29 @@ const sfx={
   ok:()=>[784,1175].forEach((f,i)=>tone(f,.08,i*.08)),
   no:()=>[300,200].forEach((f,i)=>tone(f,.1,i*.1))
 };
+/* Soundtrack 8-bit original: 8 compases en La menor, se repite */
+const Music=(()=>{
+  const mf=m=>440*Math.pow(2,(m-69)/12),BPM=108,ST=60/BPM/2;
+  const CH=[[57,60,64],[53,57,60],[48,52,55],[55,59,62],[53,57,60],[55,59,62],[52,55,59],[57,60,64]];
+  const MEL=[69,0,72,0,76,74,72,0, 72,0,69,0,65,67,69,0, 67,0,72,0,76,0,79,77, 76,0,74,0,71,0,0,0,
+             69,72,77,0,76,74,72,0, 74,0,71,74,79,0,77,76, 76,0,71,0,67,71,76,79, 81,0,76,0,72,0,69,0];
+  let step=0,next=0,timer=null,noise=null;
+  function hat(t){const a=AC;if(!noise){noise=a.createBuffer(1,a.sampleRate*.05,a.sampleRate);const d=noise.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+    const s=a.createBufferSource(),g=a.createGain(),f=a.createBiquadFilter();f.type='highpass';f.frequency.value=6000;s.buffer=noise;g.gain.setValueAtTime(.04,t);g.gain.exponentialRampToValueAtTime(.0001,t+.04);s.connect(f).connect(g).connect(MG);s.start(t);s.stop(t+.05);}
+  function sched(){const a=AC;if(!a||a.state!=='running')return;if(next<a.currentTime)next=a.currentTime+.05;
+    while(next<a.currentTime+.15){const bar=Math.floor(step/8)%8,i=step%8,ch=CH[bar],m=MEL[step%64];
+      const bassN=[ch[0]-12,0,ch[0]-12,0,ch[2]-12,0,ch[0],0][i];
+      if(bassN)tone(mf(bassN),ST*1.6,next,'triangle',.11,MG);
+      tone(mf(ch[[0,1,2,1][i%4]]+12),ST*.6,next,'square',.012,MG);
+      if(m)tone(mf(m),ST*1.7,next,'square',.03,MG);
+      if(i%2===1)hat(next);
+      next+=ST;step++;}}
+  return{start(){if(timer||!musicOn||document.hidden)return;const a=ac();if(!a)return;next=0;timer=setInterval(sched,30);},
+         stop(){clearInterval(timer);timer=null;}};
+})();
+document.addEventListener('visibilitychange',()=>{if(document.hidden){Music.stop();if(AC)AC.suspend().catch(()=>{});}else if(AC){AC.resume().catch(()=>{});if(musicOn)Music.start();}});
 $('mute').onclick=()=>{muted=!muted;try{localStorage.setItem('alb_mute',muted?'1':'0')}catch(e){}hdr();if(!muted)sfx.blip();};
+$('music').onclick=()=>{musicOn=!musicOn;try{localStorage.setItem('alb_music',musicOn?'1':'0')}catch(e){}if(musicOn)Music.start();else Music.stop();hdr();};
 
 /* ===== Sprites pixel de relleno ===== */
 const sprCache={};
@@ -404,7 +434,7 @@ function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTime
 function hdr(){
   $('hdsub').textContent=S.ready?`Jugando como ${nm(me)} · ${uniq(me)}/${CARDS.length}`:'Cargando…';
   $('hdpacks').innerHTML=`SOBRES <b>${P(me).packs||0}</b>`;
-  $('mute').textContent=muted?'♪ OFF':'♪ ON';
+  $('mute').classList.toggle('off',muted);$('music').classList.toggle('off',!musicOn);
 }
 function navR(){
   const pend=S.trades.filter(t=>t.status==='pending'&&t.to===me).length;
@@ -667,7 +697,6 @@ function bind(){
   m.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{sec=-1;sfx.blip();render();scrollTo(0,0);});
   m.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{spg=+b.dataset.go;sfx.blip();render();});
   m.querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>{sfx.blip();showCard(b.dataset.card);});
-  const g=$('grid');if(g){let x0=null;g.ontouchstart=e=>x0=e.touches[0].clientX;g.ontouchend=e=>{if(x0==null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>60)flip(d<0?1:-1);x0=null;};}
   const on=(id,fn)=>{const el=$(id);if(el)el.onclick=fn;};
   on('open',()=>{ac();sfx.blip();openPack();});on('daily',claimDaily);on('swap',swapDups);on('redeem',redeem);on('propose',propose);on('mkcode',mkCode);on('reset',doReset);
   on('logout',()=>{signOut(auth);});
