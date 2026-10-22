@@ -323,35 +323,35 @@ const RSTARS={C:1,R:2,B:3,L:4,M:5};
 const PER_PACK=5,PER_PAGE=10,DAILY=2;
 const R_=(r,...n)=>n.map(x=>[x,r]);
 const SECTIONS=[
- {t:'The Legend of Zelda',who:'De Mati',c:'#3fae6a',k:[...R_('L','Trifuerza','Espada Maestra'),...R_('B','Link','Princesa Zelda','Ganondorf','Ocarina del Tiempo','Escudo Hyliano'),
+ {t:'The Legend of Zelda',who:'De Mati',c:'#3fae6a',k:[...R_('L','Link','Princesa Zelda'),...R_('B','Trifuerza','Espada Maestra','Ganondorf','Ocarina del Tiempo','Escudo Hyliano'),
    ...R_('R','Escudo Kokiri','Epona','Navi','Sheik','Midna','Fi','Máscara de Majora','Gran Árbol Deku','Gran Hada','Arco del Héroe','Templo del Tiempo'),
    ...R_('C','Impa','Darunia','Princesa Ruto','Saria','Nabooru','Rauru','Tingle','Skull Kid','Kaepora Gaebora','Malon','Octorok','Moblin','Stalfos','Lizalfos','Like Like','Deku Scrub','Skulltula dorada','Rupia','Contenedor de corazón','Bombas','Bumerán','Gancho','Botella con hada','Botas de hierro','Ocarina de las Hadas','Castillo de Hyrule')]},
- {t:'Mundo Mario Bros',who:'De Mati',c:'#e0483e',k:[...R_('L','Mario','Superestrella'),...R_('B','Luigi','Bowser','Princesa Peach','Yoshi'),
+ {t:'Mundo Mario Bros',who:'De Mati',c:'#e0483e',k:[...R_('L','Mario'),...R_('B','Superestrella','Luigi','Bowser','Princesa Peach','Yoshi'),
    ...R_('R','Toad','Wario','Waluigi','Rosalina','Bowser Jr.','Princesa Daisy','Rey Boo','Flor de fuego','Bloque ?'),
    ...R_('C','Goomba','Koopa Troopa','Shy Guy','Lakitu','Bill Bala','Chomp Cadenas','Planta Piraña','Thwomp','Hermano Martillo','Kamek','Toadette','Birdo','Huesitos','Blooper','Champiñón','Champiñón 1-Up','Hoja Tanuki','Pluma de capa','Moneda','Tubería verde','Caparazón azul','Kart de Mario Kart','Bandera de meta')]},
- {t:'Clásicos de Nintendo',who:'De Mati',c:'#f08a24',k:[...R_('L','Bola Smash','Donkey Kong'),...R_('B','Kirby','Samus Aran','Pikachu','Fox McCloud'),
+ {t:'Clásicos de Nintendo',who:'De Mati',c:'#f08a24',k:[...R_('L','Donkey Kong','Pikachu'),...R_('B','Bola Smash','Kirby','Samus Aran','Fox McCloud'),
    ...R_('R','Captain Falcon','Ness','Diddy Kong','Rey Dedede','Meta Knight','Ice Climbers','Pit','Mewtwo','Pokébola'),
    ...R_('C','Falco','Peppy Hare','Arwing','Metroid','Ridley','King K. Rool','Cranky Kong','Waddle Dee','Jigglypuff','Charmander','Bulbasaur','Squirtle','Olimar y Pikmin','Aldeano','Tom Nook','Inkling','Marth','Ike','R.O.B.','Mr. Game & Watch','Duck Hunt','Little Mac','Excitebike')]},
  {t:'Consolas y cartuchos',who:'De Mati',c:'#4377e0',k:[...R_('L','Nintendo 64','Super Nintendo'),...R_('B','NES','GameCube','Game Boy','Nintendo Switch'),
    ...R_('R','Wii','Game Boy Color','Game Boy Advance','Nintendo DS','Nintendo 3DS','Virtual Boy','Wii U','Game & Watch'),
    ...R_('C','Control de NES','Control de SNES','Control de N64','Control de GameCube','Wiimote','Joy-Con','Pro Controller','Ocarina of Time','Super Mario 64','Mario Kart 64','Super Mario World','Donkey Kong Country','Pokémon Rojo','Smash Bros. Melee','GoldenEye 007','A Link to the Past','Super Metroid','Star Fox 64','Breath of the Wild')]},
- {t:'Dragones',who:'De los dos',c:'#a35bf0',k:[...R_('L','Gran Dragón'),...R_('B','Dragón oscuro'),...R_('R','Dragón de fuego','Dragón de hielo'),
-   ...R_('C','Dragón nocturno','Dragón de agua','Dragón de tierra','Dragón venenoso')]},
+ {t:'Dragones',who:'De los dos',c:'#a35bf0',k:[...R_('L','Dragón nocturno'),...R_('B','Gran Dragón'),...R_('R','Dragón oscuro','Dragón de fuego'),
+   ...R_('C','Dragón de hielo','Dragón de agua','Dragón de tierra','Dragón venenoso')]},
  {t:'Comida',who:'De los dos',c:'#d9a521',k:[...R_('L','Completos'),...R_('B','Pizza','Frutillas con chocolate'),...R_('R','Hamburguesas','Tacos','Empanadas','Chocolate'),
    ...R_('C','Papas fritas','Fajitas','Fideos','Lasaña','Carne asada','Cazuela de vacuno','Helados','Churros','Sopaipillas','Mote con huesillo','Pie de limón')]},
- {t:'Bandas y artistas',who:'De los dos',c:'#e0507a',k:[...R_('L','Pearl Jam'),...R_('B',"Guns N' Roses",'Metallica'),...R_('R','Linkin Park','Los Bunkers','Ricardo Arjona','Bad Bunny'),
+ {t:'Bandas y artistas',who:'De los dos',c:'#e0507a',k:[...R_('L','Pearl Jam','Ricardo Arjona'),...R_('B',"Guns N' Roses",'Metallica'),...R_('R','Linkin Park','Los Bunkers','Bad Bunny'),
    ...R_('C','Limp Bizkit','Chico Trujillo','Entremares','Amar Azul','Dread Mar I','Luis Miguel','Luis Fonsi','Cristian Castro','Mon Laferte')]},
  {t:'Fechas importantes',who:'De los dos',c:'#ff5fd2',k:R_('M','Cumpleaños de Mati','Cumpleaños de Marcelita','Nuestro aniversario')},
- {t:'Festividades',who:'De los dos',c:'#2bb3c0',k:[...R_('L','Navidad'),...R_('B','Fiestas Patrias'),...R_('R','San Valentín','Halloween'),
+ {t:'Festividades',who:'De los dos',c:'#2bb3c0',k:[...R_('L','Fiestas Patrias'),...R_('B','Navidad'),...R_('R','San Valentín','Halloween'),
    ...R_('C','Año Nuevo','Pascua de Resurrección','Carnaval','Cumpleaños','Día de los Muertos')]},
- {t:'Películas y series',who:'De los dos',c:'#7f6cf0',k:[...R_('L','Piratas del Caribe'),...R_('B','Shingeki no Kyojin','Moana'),...R_('R','The Last Kingdom','Aladdín','Rapunzel'),
+ {t:'Películas y series',who:'De los dos',c:'#7f6cf0',k:[...R_('L','Moana'),...R_('B','Piratas del Caribe','Shingeki no Kyojin'),...R_('R','The Last Kingdom','Aladdín','Rapunzel'),
    ...R_('C','El cuento de la criada','Tinkerbell','Tarzán','Tierra de osos','Una noche en el museo','La princesa y el sapo')]},
  {t:'Gatos',who:'De los dos',c:'#e8a05c',k:[...R_('L','Los tres juntos'),...R_('B','Rusia'),...R_('R','Nino'),...R_('C','Hades')]},
- {t:'Personajes',who:'De los dos',c:'#5a8fd8',k:[...R_('L','Jack Sparrow','Eren Jaeger'),...R_('B','Genio','Levi Ackerman','Moana','Tiana'),
-   ...R_('R','Mikasa Ackerman','Uhtred','Rapunzel','Flynn Rider','Aladdín','Kenai','Larry Daley','Maui','Te Fiti'),
+ {t:'Personajes',who:'De los dos',c:'#5a8fd8',k:[...R_('L','Jack Sparrow','Mikasa Ackerman'),...R_('B','Genio','Levi Ackerman','Moana','Tiana'),
+   ...R_('R','Eren Jaeger','Uhtred','Rapunzel','Flynn Rider','Aladdín','Kenai','Larry Daley','Maui','Te Fiti'),
    ...R_('C','Armin Arlert','Titán Colosal','Rey Alfred','June Osborne','Will Turner','Elizabeth Swann','Capitán Barbossa','Davy Jones','Pascal','Tinkerbell','Tarzán','Jane Porter','Jasmín','Abú','Jafar','Koda','Teddy Roosevelt','Rexy','Dexter','Hei Hei','Príncipe Naveen','Dr. Facilier')]},
  {t:'Amigos',who:'De los dos',c:'#7cb83a',k:[...R_('L','Coni'),...R_('B','Andrea'),...R_('R','Jared','Cota','Pinu'),...R_('C','Nati','Fabi','Sam','Diego','Javi','Dani')]},
- {t:'Panoramas',who:'De los dos',c:'#26a69a',k:[...R_('L','Familia de Legos'),...R_('B','Conciertos Piedra Negra'),...R_('R','Salida a Viña','Juegos inflables en Villarrica'),
+ {t:'Panoramas',who:'De los dos',c:'#26a69a',k:[...R_('L','Salida a Viña'),...R_('B','Familia de Legos'),...R_('R','Conciertos Piedra Negra','Juegos inflables en Villarrica'),
    ...R_('C','Playa con los chiquillos','Fonda Doña Florinda','Salida nocturna en la Ñipa','Idas al cine','Creación de pixelarts')]},
  {t:'Favoritos de Marcelita',who:'De Marcelita',c:'#b866e8',k:[...R_('L','Hacer sentir bien a las personas'),...R_('B','Ir a la playa'),...R_('R','Volleyball'),...R_('C','Dormir','Ir a la piscina')]},
  {t:'Metas y sueños',who:'De los dos',c:'#f4c430',k:[...R_('L','Tener un hogar juntos'),...R_('B','Rapa Nui','Noruega'),...R_('R','Punta Cana','Camioneta rodante'),
@@ -847,7 +847,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='7';
+const APP_VERSION='8';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
