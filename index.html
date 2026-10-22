@@ -219,6 +219,8 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 /* láminas con letra (sección Te amo) */
 .card .art.ltr{background:radial-gradient(circle at 50% 45%,#ff8fb0 0,#ff4f7b 45%,#8a1f45 100%);display:flex;align-items:center;justify-content:center}
 .card .art .lt{font-family:var(--pix);font-size:42cqw;line-height:1;color:#fff;text-shadow:4cqw 4cqw 0 #8a1f45,0 0 6cqw #fff8}
+.pxedit .art{touch-action:none;cursor:grab}
+.pxedit{width:min(250px,62vw)}
 /* índice de secciones */
 .idx{display:grid;gap:12px}
 @media (min-width:640px){.idx{grid-template-columns:1fr 1fr}}
@@ -765,10 +767,8 @@ try{pxOn=localStorage.getItem('alb_px')!=='0';pxDet=localStorage.getItem('alb_px
 function loadImg(file){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=rej;img.src=URL.createObjectURL(file);});}
 function coverDraw(g,img,W,H){const s=Math.max(W/img.width,H/img.height),w=img.width*s,h=img.height*s;g.drawImage(img,(W-w)/2,(H-h)/2,w,h);}
 function photoURL(img){const cv=document.createElement('canvas');cv.width=400;cv.height=560;coverDraw(cv.getContext('2d'),img,400,560);return cv.toDataURL('image/jpeg',.78);}
-function pixelURL(img,W){
-  const H=Math.round(W*7/5),sm=document.createElement('canvas');sm.width=W;sm.height=H;
-  const g=sm.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';coverDraw(g,img,W,H);
-  const id=g.getImageData(0,0,W,H),d=id.data,BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+function pixelFrom(sm){
+  const W=sm.width,H=sm.height,g=sm.getContext('2d'),id=g.getImageData(0,0,W,H),d=id.data,BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=(y*W+x)*4;let r=d[i],gr=d[i+1],b=d[i+2];
     const l=(r+gr+b)/3;r=l+(r-l)*1.25;gr=l+(gr-l)*1.25;b=l+(b-l)*1.25;
     r=(r-128)*1.12+128;gr=(gr-128)*1.12+128;b=(b-128)*1.12+128;
@@ -782,25 +782,60 @@ function pixelURL(img,W){
 let pend=null;
 async function upload(id,file){
   if(!file)return;
-  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img};showPx();}catch(e){toast('No se pudo abrir esa foto');}
+  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,z:1,px:0,py:0,ratio:5/7};showPx();}catch(e){toast('No se pudo abrir esa foto');}
 }
+/* dibuja la foto con el zoom y la posición elegidos */
+function drawSrc(W,H){
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+  g.fillStyle='#17142b';g.fillRect(0,0,W,H);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+  const img=pend.img,sc=Math.max(W/img.width,H/img.height)*pend.z,w=img.width*sc,h=img.height*sc;
+  g.drawImage(img,(W-w)/2+pend.px*W,(H-h)/2+pend.py*H,w,h);return cv;
+}
+function zMin(){const img=pend.img,r=pend.ratio,W=1,H=1/r;return Math.min(W/img.width,H/img.height)/Math.max(W/img.width,H/img.height);}
+function makeURL(){
+  if(pxOn){const W=PXDET[pxDet];return pixelFrom(drawSrc(W,Math.max(1,Math.round(W/pend.ratio))));}
+  return drawSrc(400,Math.round(400/pend.ratio)).toDataURL('image/jpeg',.8);
+}
+let pxRaf=0;
+function redrawPx(){if(pxRaf)return;pxRaf=requestAnimationFrame(()=>{pxRaf=0;if(!pend)return;pend.url=makeURL();const el=$('ovin').querySelector('.zoom .art');if(el){el.style.backgroundImage=`url('${pend.url}')`;el.classList.remove('spr');}});}
 function showPx(){
   if(!pend)return;const c=CBY[pend.id];
-  pend.url=pxOn?pixelURL(pend.img,PXDET[pxDet]):photoURL(pend.img);
   $('ov').hidden=false;document.body.classList.add('ov-open');
-  $('ovin').innerHTML=`<div class="ovtitle pix">VISTA PREVIA</div>
-    <div class="zoom">${cardHTML(c,0,pend.url)}</div>
+  $('ovin').innerHTML=`<div class="ovtitle pix">AJUSTA TU FOTO</div>
+    <div class="zoom pxedit">${cardHTML(c,0,'data:image/gif;base64,R0lGODlhAQABAAAAACw=')}</div>
+    <div class="hint" style="animation:none">ARRASTRA PARA MOVER · PELLIZCA PARA ZOOM</div>
     <div class="box" style="width:100%;display:flex;flex-direction:column;gap:12px">
+      <label class="row"><span class="lbl" style="width:80px">Tamaño</span><input type="range" id="pxz" min="0" max="1000" style="flex:1;accent-color:var(--yel)"></label>
+      <div class="row"><span class="lbl" style="flex:1">Posición</span><button class="btn ghost sm" id="pxfit">VER COMPLETA</button><button class="btn ghost sm" id="pxreset">CENTRAR</button></div>
       <div class="row"><span class="lbl" style="flex:1">Filtro pixel 8-bit</span><button class="btn sm ${pxOn?'':'ghost'}" id="pxtog">${pxOn?'ACTIVADO':'DESACTIVADO'}</button></div>
       ${pxOn?`<div class="row"><span class="lbl" style="flex:1">Detalle</span>${Object.keys(PXDET).map(k=>`<button class="btn sm ${pxDet===k?'':'ghost'}" data-pxd="${k}">${k.toUpperCase()}</button>`).join('')}</div>`:''}
     </div>
     <div class="row"><button class="btn" id="pxsave">GUARDAR</button><button class="btn ghost" id="pxcancel">CANCELAR</button></div>`;
+  const art=$('ovin').querySelector('.zoom .art'),bx=art.getBoundingClientRect();
+  if(bx.width&&bx.height)pend.ratio=bx.width/bx.height;
+  /* zoom: escala logarítmica entre "foto completa" y 4x */
+  const zr=$('pxz'),zmin=zMin(),ZMAX=4,toS=z=>Math.round(Math.log(z/zmin)/Math.log(ZMAX/zmin)*1000),fromS=v=>zmin*Math.pow(ZMAX/zmin,v/1000);
+  const setZ=z=>{pend.z=Math.max(zmin,Math.min(ZMAX,z));zr.value=toS(pend.z);redrawPx();};
+  zr.value=toS(pend.z);zr.oninput=()=>{pend.z=fromS(+zr.value);redrawPx();};
+  $('pxfit').onclick=()=>{pend.px=pend.py=0;setZ(zmin);sfx.blip();};
+  $('pxreset').onclick=()=>{pend.px=pend.py=0;setZ(1);sfx.blip();};
+  /* arrastrar y pellizcar sobre la imagen */
+  const pts=new Map();let last=null,pinch=null;
+  art.onpointerdown=e=>{art.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),z:pend.z};}else last={x:e.clientX,y:e.clientY};};
+  art.onpointermove=e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});const r=art.getBoundingClientRect();
+    if(pts.size>=2&&pinch){const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch.d>0)setZ(pinch.z*d/pinch.d);}
+    else if(last){pend.px+=(e.clientX-last.x)/r.width;pend.py+=(e.clientY-last.y)/r.height;pend.px=Math.max(-1.5,Math.min(1.5,pend.px));pend.py=Math.max(-1.5,Math.min(1.5,pend.py));last={x:e.clientX,y:e.clientY};redrawPx();}};
+  const up=e=>{pts.delete(e.pointerId);pinch=null;last=pts.size===1?[...pts.values()][0]:null;};
+  art.onpointerup=up;art.onpointercancel=up;
+  art.onwheel=e=>{e.preventDefault();setZ(pend.z*(e.deltaY<0?1.08:1/1.08));};
   $('pxtog').onclick=()=>{pxOn=!pxOn;try{localStorage.setItem('alb_px',pxOn?'1':'0')}catch(e){}sfx.blip();showPx();};
   $('ovin').querySelectorAll('[data-pxd]').forEach(b=>b.onclick=()=>{pxDet=b.dataset.pxd;try{localStorage.setItem('alb_pxd',pxDet)}catch(e){}sfx.blip();showPx();});
   $('pxcancel').onclick=()=>{URL.revokeObjectURL(pend.img.src);pend=null;closeOv();};
-  $('pxsave').onclick=async()=>{const b=$('pxsave');b.disabled=true;b.textContent='GUARDANDO…';const {id,url}=pend;
+  $('pxsave').onclick=async()=>{const b=$('pxsave');b.disabled=true;b.textContent='GUARDANDO…';const id=pend.id,url=makeURL();
     try{await setDoc(doc(fs,'cardimg',id),{d:url});URL.revokeObjectURL(pend.img.src);pend=null;closeOv();sfx.ok();toast('Foto lista');}
     catch(e){b.disabled=false;b.textContent='GUARDAR';toast('No se pudo guardar. Revisa tu conexión.');}};
+  redrawPx();
 }
 
 /* ===== Eventos ===== */
@@ -886,7 +921,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='9';
+const APP_VERSION='10';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
