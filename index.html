@@ -221,6 +221,17 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 .card .art .lt{font-family:var(--pix);font-size:42cqw;line-height:1;color:#fff;text-shadow:4cqw 4cqw 0 #8a1f45,0 0 6cqw #fff8}
 .pxedit .art{touch-action:none;cursor:grab}
 .pxedit{width:min(250px,62vw)}
+/* visor 3D */
+.tilt{width:min(270px,68vw);perspective:1100px;touch-action:none;cursor:grab;--sh:0px 10px;filter:drop-shadow(var(--sh) 14px #000a)}
+.t3d{position:relative;transform-style:preserve-3d;will-change:transform}
+.tface{position:relative;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.tback{position:absolute;inset:0;transform:rotateY(180deg)}
+.tbk{flex-direction:column;gap:14px;text-align:center}
+.tbk span{font-family:var(--pix);font-size:clamp(12px,4vw,16px);line-height:1.7;color:var(--yel);text-shadow:2px 2px 0 var(--red)}
+.tbk .logo{display:flex;gap:4px}.tbk .logo i{width:12px;height:12px;display:block}
+.tbk small{font-family:var(--pix);font-size:9px;color:var(--mute)}
+.glare{position:absolute;inset:0;pointer-events:none;z-index:4;mix-blend-mode:soft-light}
+.mc.tv{border:0;padding:0;background:none;cursor:zoom-in}
 /* índice tipo cartuchos */
 .coll{display:flex;flex-direction:column;gap:10px}
 .cpct{font-family:var(--pix);font-size:18px;color:var(--grn)}
@@ -688,7 +699,7 @@ function vTaller(){
     <div class="row" style="margin-top:12px"><span class="muted">Tope de sobres por día</span><input type="number" id="capin" min="1" max="20" value="${cap()}" style="width:90px"></div></div>
   <div class="box"><div class="lbl">Láminas</div>
     <div class="row" style="margin:10px 0 14px"><select id="tpage">${PAGES.map((p,i)=>`<option value="${i}" ${i===tallerPage?'selected':''}>${i+1}. ${esc(p.t)}</option>`).join('')}</select></div>
-    <div class="edl">${cs.map(c=>`<div class="edrow"><div class="mc">${cardHTML(c)}</div>
+    <div class="edl">${cs.map(c=>`<div class="edrow"><button class="mc tv" data-tview="${c.id}" aria-label="Ver ${esc(cname(c))} en grande">${cardHTML(c)}</button>
       <input type="text" id="cn-${c.id}" data-cn="${c.id}" value="${esc(cname(c))}" aria-label="Nombre lámina ${c.num}">
       <label class="btn ghost sm" style="cursor:pointer">${cimg(c)?'CAMBIAR':'FOTO'}<input type="file" accept="image/*" data-up="${c.id}" hidden></label></div>`).join('')}</div></div>
   <div class="box"><div class="lbl">Canción de fondo</div>
@@ -740,18 +751,54 @@ function showPack(drawn,done){
   }
 }
 function celebrate(done){if(done&&done.length){setTimeout(()=>{sfx.fan();(done.some(i=>SECTIONS[i].letters)?toast('♥ T E  A M O ♥  ¡Completaste la sección más importante!'):toast('¡SECCIÓN COMPLETA! '+done.map(i=>SECTIONS[i].t).join(' · ')));},250);}}
-function closeOv(){const ov=$('ov');ov.hidden=true;ov.className='ov';$('ovin').innerHTML='';document.body.classList.remove('ov-open');if(dirty){dirty=false;render();}}
+function closeOv(){if(tiltOff){tiltOff();tiltOff=null;}const ov=$('ov');ov.hidden=true;ov.className='ov';$('ovin').innerHTML='';document.body.classList.remove('ov-open');if(dirty){dirty=false;render();}}
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov'&&!$('pk')&&!document.querySelector('.fc'))closeOv();});
 
+/* ===== Visor 3D de lámina ===== */
+let tiltOff=null;
+function tiltHTML(c,n=0){return `<div class="tilt" id="tilt"><div class="t3d" id="t3d">
+  <div class="tface">${cardHTML(c,n)}<div class="glare" id="glare"></div></div>
+  <div class="tface tback"><div class="back tbk"><span class="logo"><i style="background:var(--red)"></i><i style="background:var(--yel)"></i><i style="background:var(--grn)"></i><i style="background:var(--blu)"></i></span><span>NUESTRO<br>ÁLBUM<br>RETRO</span><small>#${String(c.num).padStart(3,'0')}</small></div></div>
+  </div></div><div class="hint" style="animation:none">ARRASTRA PARA GIRARLA</div>`;}
+function bindTilt(){
+  const w=$('tilt'),t=$('t3d'),gl=$('glare');if(!w)return;
+  let rx=0,ry=0,last=null,raf=0,base=null,sx=0,sy=0;
+  const apply=()=>{t.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+    gl.style.background=`radial-gradient(circle at ${50+Math.sin(ry*Math.PI/180)*70}% ${50+rx*1.6}%,#ffffff70,#ffffff00 55%)`;
+    const k=((ry%360)+540)%360-180;w.style.setProperty('--sh',`${(-k/6).toFixed(1)}px ${(10-rx/3).toFixed(1)}px`);};
+  const frame=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;apply();});};
+  w.onpointerdown=e=>{w.setPointerCapture(e.pointerId);last={x:e.clientX,y:e.clientY};t.style.transition='none';};
+  w.onpointermove=e=>{if(!last)return;ry+=(e.clientX-last.x)*.7;rx-=(e.clientY-last.y)*.45;rx=Math.max(-40,Math.min(40,rx));last={x:e.clientX,y:e.clientY};frame();};
+  const up=()=>{if(!last)return;last=null;ry=Math.round(ry/360)*360;rx=0;t.style.transition='transform .7s cubic-bezier(.2,.9,.3,1.25)';apply();if(navigator.vibrate)navigator.vibrate(8);};
+  w.onpointerup=up;w.onpointercancel=up;
+  /* inclinar el celular también mueve la lámina */
+  const ori=e=>{if(last||e.beta==null)return;if(!base)base={b:e.beta,g:e.gamma};
+    const tx=Math.max(-18,Math.min(18,(e.beta-base.b)*-.6)),ty=Math.max(-22,Math.min(22,(e.gamma-base.g)*.8));
+    t.style.transition='transform .12s linear';rx=tx;ry=Math.round(ry/360)*360+ty;frame();};
+  window.addEventListener('deviceorientation',ori);
+  tiltOff=()=>window.removeEventListener('deviceorientation',ori);
+  apply();
+}
+function showTallerCard(id){
+  const c=CBY[id];
+  $('ov').hidden=false;document.body.classList.add('ov-open');
+  $('ovin').innerHTML=`${tiltHTML(c)}
+    <div class="box" style="width:100%;text-align:center"><div class="lbl">${esc(SECTIONS[c.page].t)} · ${RAR[c.r].n}</div>
+      <div style="font-size:24px;margin-top:8px">${esc(cname(c))}</div><div class="muted">${cimg(c)?'Con foto':'Sin foto todavía'}</div></div>
+    <div class="row"><label class="btn" style="cursor:pointer">${cimg(c)?'CAMBIAR FOTO':'SUBIR FOTO'}<input type="file" accept="image/*" id="tvup" hidden></label><button class="btn ghost" id="cls">CERRAR</button></div>`;
+  $('cls').onclick=closeOv;
+  const f=$('tvup');f.onchange=()=>{const x=f.files[0];if(x){if(tiltOff){tiltOff();tiltOff=null;}upload(id,x);}};
+  bindTilt();
+}
 function showCard(id){
   const c=CBY[id],n=cnt(me,id),o=other(),on=cnt(o,id);
   $('ov').hidden=false;document.body.classList.add('ov-open');
-  $('ovin').innerHTML=`${n?`<div class="zoom">${cardHTML(c,n)}</div>`:`<div class="zoom"><div class="slot" style="width:100%"><span class="n">${String(c.num).padStart(3,'0')}</span><span class="t">${esc(cname(c))}</span></div></div>`}
+  $('ovin').innerHTML=`${n?tiltHTML(c,n):`<div class="zoom"><div class="slot" style="width:100%"><span class="n">${String(c.num).padStart(3,'0')}</span><span class="t">${esc(cname(c))}</span></div></div>`}
     <div class="box" style="width:100%;text-align:center"><div class="lbl">${esc(PAGES[c.page].t)} · ${RAR[c.r].n}</div>
     <div style="font-size:24px;margin-top:8px">${n?`Tienes ${n}${n>1?` (${n-1} repetida${n>2?'s':''})`:''}`:'Te falta esta lámina'}</div>
     <div class="muted">${esc(nm(o))} tiene ${on}</div></div>
     <div class="row">${!n&&on>1?`<button class="btn" id="ask">PEDÍRSELA</button>`:''}<button class="btn ghost" id="cls">CERRAR</button></div>`;
-  $('cls').onclick=closeOv;
+  $('cls').onclick=closeOv;bindTilt();
   const a=$('ask');if(a)a.onclick=()=>{tWant=id;tGive=null;closeOv();tab='cambios';render();toast('Ahora elige qué repetida le das');};
 }
 
@@ -907,6 +954,7 @@ function bind(){
   const ci=$('capin');if(ci)ci.oninput=()=>debounced('cap',()=>patchCfg({packCap:Math.max(1,Math.min(20,+ci.value||4))}));
   const tp=$('tpage');if(tp)tp.onchange=()=>{tallerPage=+tp.value;render();};
   m.querySelectorAll('[data-cn]').forEach(i=>i.oninput=()=>debounced('cn'+i.dataset.cn,()=>patchCfg({cards:{[i.dataset.cn]:{name:i.value.trim()}}})));
+  m.querySelectorAll('[data-tview]').forEach(b=>b.onclick=()=>{sfx.blip();showTallerCard(b.dataset.tview);});
   m.querySelectorAll('[data-up]').forEach(i=>i.onchange=()=>{const f=i.files[0];i.value='';upload(i.dataset.up,f);});
 }
 
@@ -966,7 +1014,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='11';
+const APP_VERSION='12';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
