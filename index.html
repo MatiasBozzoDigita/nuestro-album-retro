@@ -23,7 +23,7 @@ img{max-width:100%}
 :root{
   --bg:#17142b; --panel:#231e41; --panel2:#2e2853; --line:#4a4382; --ink:#f3ecd9; --mute:#a39dd0;
   --red:#e0483e; --yel:#f4c430; --grn:#3fae6a; --blu:#4377e0;
-  --c-C:#8a84b8; --c-R:#4f8bff; --c-B:#d38cff; --c-L:#f4c430;
+  --c-C:#8a84b8; --c-R:#4f8bff; --c-B:#d38cff; --c-L:#f4c430; --c-M:#ff5fd2;
   --pix:"Press Start 2P", ui-monospace, monospace;
   --body:"VT323", ui-monospace, monospace;
   color-scheme:dark;
@@ -127,7 +127,7 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 .big{font-family:var(--pix);font-size:28px;color:var(--yel)}
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .row > .grow{flex:1;min-width:0}
-.odds{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.odds{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px}
 .odds div{background:#0f0c1f;box-shadow:0 0 0 2px var(--line);padding:8px;text-align:center}
 .odds b{display:block;font-family:var(--pix);font-size:11px;font-weight:400;margin-top:4px}
 
@@ -149,9 +149,9 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 @keyframes gone{to{transform:translateY(-40px) scale(1.15);opacity:0}}
 .hint{font-family:var(--pix);font-size:9px;color:var(--mute);text-align:center;line-height:1.7;animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:.35}}
-.reveal{display:grid;grid-template-columns:repeat(2,minmax(0,170px));gap:22px 20px;justify-content:center;width:100%}
-@media (min-width:640px){.reveal{grid-template-columns:repeat(4,minmax(0,130px))}}
-.fc{perspective:900px;border:0;padding:0;background:none;display:flex;flex-direction:column;gap:10px;align-items:center;width:100%;animation:deal .35s cubic-bezier(.2,.8,.3,1) backwards}
+.reveal{display:flex;flex-wrap:wrap;justify-content:center;gap:18px 14px;width:100%}
+@media (min-width:640px){.reveal .fc{width:calc((100% - 56px)/5)!important}}
+.fc{perspective:900px;border:0;padding:0;background:none;display:flex;flex-direction:column;gap:10px;align-items:center;width:calc((100% - 28px)/3);max-width:150px;animation:deal .35s cubic-bezier(.2,.8,.3,1) backwards}
 .fcin{width:100%;aspect-ratio:5/7;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,.7,.2,1);will-change:transform}
 .fc.on .fcin{transform:rotateY(180deg)}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
@@ -192,6 +192,27 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 .edrow .mc{width:52px}
 .toast{position:fixed;left:50%;top:calc(80px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:60;background:var(--yel);color:#1a1300;font-family:var(--pix);font-size:10px;line-height:1.6;padding:12px 14px;box-shadow:0 0 0 3px #000,6px 6px 0 3px #0008;max-width:calc(100% - 32px);text-align:center}
 .banner{background:#3a2a10;box-shadow:0 0 0 2px var(--yel);padding:8px 12px;color:#ffe6a6}
+
+/* índice de secciones */
+.idx{display:grid;gap:12px}
+@media (min-width:640px){.idx{grid-template-columns:1fr 1fr}}
+.sx{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;border:0;background:var(--panel);box-shadow:0 0 0 3px var(--line),4px 4px 0 3px #0008;padding:10px 12px}
+.sx:active{transform:translate(2px,2px)}
+.sxn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--pc);color:#fff;font-family:var(--pix);font-size:12px;text-shadow:1px 1px 0 #0006}
+.sxb{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sxt{font-size:22px;line-height:1;color:var(--ink)}
+.sxw{font-size:16px;color:var(--mute)}
+.sxb .prog{height:8px}
+.sxb .prog i{background:var(--pc)}
+.sxc{font-family:var(--pix);font-size:9px;color:var(--pc)}
+.sx.done{box-shadow:0 0 0 3px var(--pc),4px 4px 0 3px #0008}
+/* míticas */
+.card.my{box-shadow:0 0 0 3px #fff,4px 4px 0 3px #0009}
+.card.my .top{background:linear-gradient(90deg,#ff5fd2,#f4c430,#3fae6a,#4fb8ff,#b866e8)}
+.card.my::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border:3px solid transparent;border-image:linear-gradient(135deg,#ff5fd2,#f4c430,#3fae6a,#4fb8ff,#b866e8) 1}
+.card.my .rar i{background:#fff}
+.slot.myslot{box-shadow:0 0 0 3px #ff5fd288;color:#c98fbf}
+.ov.mythic::before{background:radial-gradient(circle,#fff 0,#ff5fd2 35%,#4fb8ff 70%,transparent 100%)!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* login */
@@ -261,32 +282,58 @@ const WHO=['matias','polola'];
 const slug=s=>String(s).trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
 
 /* ===== Datos del álbum ===== */
-const RAR={C:{n:'Común',p:70},R:{n:'Rara',p:22},B:{n:'Brillante',p:6},L:{n:'Legendaria',p:2}};
-const RSTARS={C:1,R:2,B:3,L:4};
-const G6=['C','C','C','C','C','C'];
-const gen=(base,rs)=>rs.map((r,i)=>[base+' '+(i+1),r]);
-const PAGES=[
- {t:'The Legend of Zelda',who:'De Mati',c:'#3fae6a',k:[['Trifuerza','L'],['Espada Maestra','B'],['Escudo Hyliano','R'],['Ocarina del Tiempo','R'],['Link','C'],['Princesa Zelda','C'],['Ganondorf','C'],['Epona','C'],['Navi','C'],['Escudo Kokiri','C']]},
- {t:'Bandas favoritas',who:'De los dos',c:'#e0483e',k:[['Pearl Jam','L'],["Guns N' Roses",'B'],['Metallica','R'],['Linkin Park','R'],['Ricardo Arjona','C'],['Entre Mares','C'],['Coté Quintanilla','C'],['Bad Bunny','C'],['Chico Trujillo','C'],['Amar Azul','C']]},
- {t:'Nosotros',who:'De los dos',c:'#e8609a',k:[['El día que nos conocimos','L'],['Primera cita','B'],['Primera foto juntos','R'],['Nuestro aniversario','R'],['Selfie favorita','C'],['Domingo de flojera','C'],['Carrete juntos','C'],['Paseo de la mano','C'],['Riéndonos','C'],['Un día cualquiera','C']]},
- {t:'Consolas retro',who:'De Mati',c:'#4377e0',k:[['Nintendo 64','L'],['Super Nintendo','B'],['GameCube','R'],['Game Boy','R'],['Nintendo Switch','C'],['Wii','C'],['NES','C'],['Game Boy Advance','C'],['Nintendo DS','C'],['Control de N64','C']]},
- {t:'Lo favorito de Marcelita',who:'De Marcelita',c:'#b866e8',k:gen('Favorito de ella',['L','B','R','R',...G6])},
- {t:'Su página libre',who:'De Marcelita',c:'#e8803c',k:gen('Página libre',['B','R','R','R',...G6])},
- {t:'Comidas favoritas',who:'De los dos',c:'#d9a521',k:[['Asado','B'],['Sushi','R'],['Completo italiano','R'],['Pizza','R'],['Sopaipillas','C'],['Empanadas','C'],['Mote con huesillo','C'],['Papas fritas','C'],['Helado','C'],['Hamburguesa','C']]},
- {t:'Lugares',who:'De los dos',c:'#25a8a0',k:gen('Lugar',['B','R','R','R',...G6])},
- {t:'Películas y series',who:'De los dos',c:'#7f6cf0',k:gen('Película o serie',['B','R','R','R',...G6])},
- {t:'Chistes internos',who:'De los dos',c:'#7cb83a',k:gen('Chiste interno',['B','R','R','R',...G6])},
+const RAR={C:{n:'Común',p:69.5,s:'COMÚ'},R:{n:'Rara',p:22,s:'RARA'},B:{n:'Brillante',p:6,s:'BRIL'},L:{n:'Legendaria',p:2,s:'LEGE'},M:{n:'Mítica',p:.5,s:'MÍTI'}};
+const RSTARS={C:1,R:2,B:3,L:4,M:5};
+const PER_PACK=5,PER_PAGE=10,DAILY=2;
+const R_=(r,...n)=>n.map(x=>[x,r]);
+const SECTIONS=[
+ {t:'The Legend of Zelda',who:'De Mati',c:'#3fae6a',k:[...R_('L','Trifuerza','Espada Maestra'),...R_('B','Link','Princesa Zelda','Ganondorf','Ocarina del Tiempo'),
+   ...R_('R','Escudo Hyliano','Escudo Kokiri','Epona','Navi','Sheik','Midna','Fi','Máscara de Majora','Gran Árbol Deku','Gran Hada','Arco del Héroe'),
+   ...R_('C','Impa','Darunia','Princesa Ruto','Saria','Nabooru','Rauru','Tingle','Skull Kid','Kaepora Gaebora','Malon','Octorok','Moblin','Stalfos','Lizalfos','Like Like','Deku Scrub','Skulltula dorada','Rupia','Contenedor de corazón','Bombas','Bumerán','Gancho','Botella con hada','Botas de hierro','Ocarina de las Hadas','Castillo de Hyrule','Templo del Tiempo')]},
+ {t:'Mundo Mario Bros',who:'De Mati',c:'#e0483e',k:[...R_('L','Mario','Superestrella'),...R_('B','Luigi','Bowser','Princesa Peach','Yoshi'),
+   ...R_('R','Toad','Wario','Waluigi','Rosalina','Bowser Jr.','Princesa Daisy','Rey Boo','Flor de fuego','Bloque ?'),
+   ...R_('C','Goomba','Koopa Troopa','Shy Guy','Lakitu','Bill Bala','Chomp Cadenas','Planta Piraña','Thwomp','Hermano Martillo','Kamek','Toadette','Birdo','Huesitos','Blooper','Champiñón','Champiñón 1-Up','Hoja Tanuki','Pluma de capa','Moneda','Tubería verde','Caparazón azul','Kart de Mario Kart','Bandera de meta')]},
+ {t:'Clásicos de Nintendo',who:'De Mati',c:'#f08a24',k:[...R_('L','Bola Smash'),...R_('B','Donkey Kong','Kirby','Samus Aran','Pikachu'),
+   ...R_('R','Fox McCloud','Captain Falcon','Ness','Diddy Kong','Rey Dedede','Meta Knight','Ice Climbers','Pit'),
+   ...R_('C','Falco','Peppy Hare','Arwing','Metroid','Ridley','King K. Rool','Cranky Kong','Waddle Dee','Jigglypuff','Charmander','Bulbasaur','Squirtle','Pokébola','Mewtwo','Olimar y Pikmin','Aldeano','Tom Nook','Inkling','Marth','Ike','R.O.B.','Mr. Game & Watch','Duck Hunt','Little Mac','Excitebike')]},
+ {t:'Consolas y cartuchos',who:'De Mati',c:'#4377e0',k:[...R_('L','Nintendo 64','Super Nintendo'),...R_('B','NES','GameCube','Game Boy','Nintendo Switch'),
+   ...R_('R','Wii','Game Boy Color','Game Boy Advance','Nintendo DS','Nintendo 3DS','Virtual Boy','Wii U','Game & Watch'),
+   ...R_('C','Control de NES','Control de SNES','Control de N64','Control de GameCube','Wiimote','Joy-Con','Pro Controller','Rumble Pak','Expansion Pak','Memory Card','Zapper','Wii Balance Board','Ocarina of Time','Super Mario 64','Mario Kart 64','Super Mario World','Donkey Kong Country','Pokémon Rojo','Smash Bros. Melee','GoldenEye 007','A Link to the Past','Super Metroid','Star Fox 64','Breath of the Wild')]},
+ {t:'Dragones',who:'De los dos',c:'#a35bf0',k:[...R_('L','Gran Dragón'),...R_('B','Dragón oscuro'),...R_('R','Dragón de fuego','Dragón de hielo','Dragón nocturno'),
+   ...R_('C','Dragón de agua','Dragón de tierra','Dragón venenoso','Dragón de viento','Dragón eléctrico','Dragón de cristal','Dragón bebé')]},
+ {t:'Comida',who:'De los dos',c:'#d9a521',k:[...R_('B','Completos'),...R_('R','Pizza','Hamburguesas','Tacos','Empanadas'),
+   ...R_('C','Papas fritas','Fajitas','Fideos','Lasaña','Carne asada','Cazuela de vacuno','Helados','Churros','Frutillas con chocolate','Sushi','Sopaipillas','Mote con huesillo','Pie de limón')]},
+ {t:'Bandas y artistas',who:'De los dos',c:'#e0507a',k:[...R_('L','Pearl Jam'),...R_('B',"Guns N' Roses",'Metallica'),...R_('R','Linkin Park','Los Bunkers','Ricardo Arjona','Bad Bunny'),
+   ...R_('C','Limp Bizkit','Chico Trujillo','Entremares','Amar Azul','Dread Mar I','Luis Miguel','Luis Fonsi','Cristian Castro','Mon Laferte')]},
+ {t:'Fechas importantes',who:'De los dos',c:'#ff5fd2',k:R_('M','24 de agosto','29 de octubre','2 de noviembre')},
+ {t:'Festividades',who:'De los dos',c:'#2bb3c0',k:[...R_('L','Navidad'),...R_('B','Fiestas Patrias'),...R_('R','Halloween','Año Nuevo','San Valentín'),
+   ...R_('C','Pascua de Resurrección','Día del Niño','Carnaval','We Tripantu','Noche de San Juan','Cumpleaños','Día de los Muertos','Día de la Madre','Día del Padre')]},
+ {t:'Películas y series',who:'De los dos',c:'#7f6cf0',k:[...R_('B','Piratas del Caribe'),...R_('R','Shingeki no Kyojin','The Last Kingdom','Aladdín'),
+   ...R_('C','El cuento de la criada','Rapunzel','Tinkerbell','Tarzán','Tierra de osos','Una noche en el museo')]},
+ {t:'Gatos',who:'De los dos',c:'#e8a05c',k:[...R_('L','Rusia','Nino','Hades'),...R_('R','Los tres juntos','Siesta gatuna'),...R_('C','Travesura gatuna')]},
+ {t:'Personajes',who:'De los dos',c:'#5a8fd8',k:[...R_('B','Eren Jaeger','Jack Sparrow','Genio'),
+   ...R_('R','Levi Ackerman','Mikasa Ackerman','Uhtred','Rapunzel','Flynn Rider','Aladdín','Kenai','Larry Daley'),
+   ...R_('C','Armin Arlert','Titán Colosal','Rey Alfred','June Osborne','Will Turner','Elizabeth Swann','Capitán Barbossa','Davy Jones','Pascal','Tinkerbell','Tarzán','Jane Porter','Jasmín','Abú','Jafar','Koda','Teddy Roosevelt','Rexy','Dexter')]},
+ {t:'Amigos',who:'De los dos',c:'#7cb83a',k:[...R_('B','La tropa completa'),...R_('R','Coni','Andrea','Jared','Cota'),...R_('C','Pinu','Nati','Fabi','Sam','Diego','Javi','Dani')]},
+ {t:'Panoramas',who:'De los dos',c:'#26a69a',k:[...R_('L','Familia de Legos'),...R_('B','Conciertos Piedra Negra'),...R_('R','Salida a Viña','Juegos inflables en Villarrica','Playa con los chiquillos'),
+   ...R_('C','Fonda Doña Florinda','Salida nocturna en la Ñipa','Idas al cine','Creación de pixelarts')]},
+ {t:'Favoritos de Marcelita',who:'De Marcelita',c:'#b866e8',k:[...R_('B','Hacer sentir bien a las personas'),...R_('R','Ir a la playa','Volleyball'),...R_('C','Dormir','Ir a la piscina')]},
+ {t:'Metas y sueños',who:'De los dos',c:'#f4c430',k:[...R_('L','Tener un hogar juntos'),...R_('B','Rapa Nui','Noruega'),...R_('R','Punta Cana','México','Camioneta rodante'),
+   ...R_('C','Tener auto','Andar en lancha privada','Pescar','Tirarse en parapente')]},
 ];
+const PAGES=SECTIONS;
 const CARDS=[];
-PAGES.forEach((p,pi)=>p.k.forEach(([n,r])=>CARDS.push({id:'c'+String(CARDS.length+1).padStart(3,'0'),num:CARDS.length+1,page:pi,dn:n,r})));
+SECTIONS.forEach((p,pi)=>p.k.forEach(([n,r])=>CARDS.push({id:'l'+String(CARDS.length+1).padStart(3,'0'),num:CARDS.length+1,page:pi,dn:n,r})));
 const CBY=Object.fromEntries(CARDS.map(c=>[c.id,c]));
-const BYR={C:[],R:[],B:[],L:[]};CARDS.forEach(c=>BYR[c.r].push(c));
+const BYR={C:[],R:[],B:[],L:[],M:[]};CARDS.forEach(c=>BYR[c.r].push(c));
+const SCN=SECTIONS.map((_,i)=>CARDS.filter(c=>c.page===i));
+const SC=i=>SCN[i];
 
 /* ===== Estado ===== */
 const def=()=>({owned:{},packs:3,lastDaily:'',openedDay:'',openedToday:0,opened:0,trades:0});
-const defCfg=()=>({names:{matias:'Mati',polola:'Marcelita'},cap:3,cards:{}});
+const defCfg=()=>({names:{matias:'Mati',polola:'Marcelita'},packCap:4,cards:{}});
 const S={players:{matias:def(),polola:def()},ex:{},cfg:defCfg(),trades:[],codes:[],imgs:{},ready:false};
-let me='matias',realMe='matias',owner=false,tab='album',page=0,tGive=null,tWant=null,tallerPage=0,unsubs=[];
+let me='matias',realMe='matias',owner=false,tab='album',sec=-1,spg=0,tGive=null,tWant=null,tallerPage=0,unsubs=[];
 const other=()=>me==='matias'?'polola':'matias';
 const nm=w=>(S.cfg.names&&S.cfg.names[w])||(w==='matias'?'Mati':'Marcelita');
 const P=w=>S.players[w];
@@ -296,9 +343,10 @@ const cname=c=>(S.cfg.cards&&S.cfg.cards[c.id]&&S.cfg.cards[c.id].name)||c.dn;
 const cimg=c=>S.imgs[c.id];
 const uniq=w=>CARDS.filter(c=>cnt(w,c.id)>0).length;
 const dups=w=>CARDS.reduce((s,c)=>s+Math.max(0,cnt(w,c.id)-1),0);
-const pageDone=(w,pi)=>CARDS.filter(c=>c.page===pi&&cnt(w,c.id)>0).length;
+const pageDone=(w,pi)=>SC(pi).filter(c=>cnt(w,c.id)>0).length;
+const secFull=(w,pi)=>pageDone(w,pi)===SC(pi).length;
 const openedToday=w=>P(w).openedDay===today()?(P(w).openedToday||0):0;
-const cap=()=>S.cfg.cap||3;
+const cap=()=>S.cfg.packCap||4;
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const $=id=>document.getElementById(id);
 
@@ -320,6 +368,7 @@ const sfx={
   tear:()=>{for(let i=0;i<6;i++)tone(200+Math.random()*400,.03,i*.025,'sawtooth',.03)},
   rare:()=>[659,784,988].forEach((f,i)=>tone(f,.09,i*.07)),
   fan:()=>[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.14,i*.11,'square',.06)),
+  myth:()=>{[392,523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,.16,i*.1,'square',.06));[1047,1319,1568,2093].forEach((f,i)=>tone(f,.4,.8+i*.18,'triangle',.05));},
   ok:()=>[784,1175].forEach((f,i)=>tone(f,.08,i*.08)),
   no:()=>[300,200].forEach((f,i)=>tone(f,.1,i*.1))
 };
@@ -331,16 +380,16 @@ function rng(seed){let a=0;for(const ch of seed)a=(a*31+ch.charCodeAt(0))|0;retu
 function sprite(c){
   if(sprCache[c.id])return sprCache[c.id];
   const r=rng(c.id+'x'),N=12,cv=document.createElement('canvas');cv.width=cv.height=N;const g=cv.getContext('2d');
-  const cols=[PAGES[c.page].c,'#f3ecd9',c.r==='L'?'#f4c430':c.r==='B'?'#d38cff':'#17142b'];
+  const cols=[PAGES[c.page].c,'#f3ecd9',c.r==='M'?'#ff5fd2':c.r==='L'?'#f4c430':c.r==='B'?'#d38cff':'#17142b'];
   for(let y=1;y<N-1;y++)for(let x=1;x<N/2;x++){const v=r();if(v<.45)continue;g.fillStyle=cols[v<.75?0:v<.9?1:2];g.fillRect(x,y,1,1);g.fillRect(N-1-x,y,1,1);}
   return sprCache[c.id]=cv.toDataURL();
 }
 
 /* ===== Lámina ===== */
 function cardHTML(c,count=0){
-  const img=cimg(c),hol=c.r==='B'||c.r==='L';
-  return `<div class="card${hol?' holo':''}${c.r==='L'?' lg':''}" style="--pc:${PAGES[c.page].c};--rc:var(--c-${c.r})">
-    <div class="top"><span>#${String(c.num).padStart(3,'0')}</span><span>${RAR[c.r].n.slice(0,4).toUpperCase()}</span></div>
+  const img=cimg(c),hol=c.r==='B'||c.r==='L'||c.r==='M';
+  return `<div class="card${hol?' holo':''}${c.r==='L'||c.r==='M'?' lg':''}${c.r==='M'?' my':''}" style="--pc:${PAGES[c.page].c};--rc:var(--c-${c.r})">
+    <div class="top"><span>#${String(c.num).padStart(3,'0')}</span><span>${RAR[c.r].s}</span></div>
     <div class="art${img?'':' spr'}" style="background-image:url('${img?img:sprite(c)}')">${hol?'<div class="shine"></div>':''}</div>
     <div class="nm">${esc(cname(c))}</div>
     <div class="rar">${'<i></i>'.repeat(RSTARS[c.r])}</div>
@@ -353,7 +402,7 @@ document.addEventListener('pointermove',e=>{const el=e.target.closest&&e.target.
 let toastT;
 function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2800);}
 function hdr(){
-  $('hdsub').textContent=S.ready?`Jugando como ${nm(me)} · ${uniq(me)}/100`:'Cargando…';
+  $('hdsub').textContent=S.ready?`Jugando como ${nm(me)} · ${uniq(me)}/${CARDS.length}`:'Cargando…';
   $('hdpacks').innerHTML=`SOBRES <b>${P(me).packs||0}</b>`;
   $('mute').textContent=muted?'♪ OFF':'♪ ON';
 }
@@ -364,7 +413,7 @@ function navR(){
   if(owner)items.push(['taller','TALLER']);
   $('nav').innerHTML=items.map(([k,l,d])=>`<button data-tab="${k}" aria-current="${tab===k}">${l}${d?`<span class="dot">${d}</span>`:''}</button>`).join('');
 }
-$('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.tab;sfx.blip();render();scrollTo(0,0);};
+$('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.tab==='album')sec=-1;tab=b.dataset.tab;sfx.blip();render();scrollTo(0,0);};
 
 function render(){hdr();navR();
   if(!S.ready){$('main').innerHTML='<p class="boot">CARGANDO ÁLBUM…</p>';return;}
@@ -375,22 +424,40 @@ let dirty=false;
 function safeRender(){if(!$('ov').hidden){dirty=true;hdr();return;}const a=document.activeElement;if(tab==='taller'&&a&&a.tagName==='INPUT'&&a.type!=='file'){hdr();navR();return;}render();}
 
 /* ===== Vista: Álbum ===== */
-function vAlbum(){
-  const p=PAGES[page],cs=CARDS.filter(c=>c.page===page),done=pageDone(me,page);
+function vAlbum(){return sec<0?vIndex():vSection();}
+function vIndex(){
+  const tot=uniq(me),N=CARDS.length;
   return `<div class="sec">
+  <div class="box"><div class="lbl">Tu colección</div><div class="row" style="margin-top:8px"><div class="big">${tot}<span class="muted" style="font-size:22px">/${N}</span></div>
+    <div style="flex:1;min-width:120px"><div class="prog"><i style="width:${tot/N*100}%"></i></div></div></div></div>
+  <div class="idx">${SECTIONS.map((x,i)=>{const n=SC(i).length,d=pageDone(me,i);return `<button class="sx${d===n?' done':''}" data-sec="${i}" style="--pc:${x.c}">
+    <span class="sxn">${String(i+1).padStart(2,'0')}</span>
+    <span class="sxb"><span class="sxt">${esc(x.t)}</span><span class="sxw">${esc(x.who)}${d===n?' · ¡COMPLETA!':''}</span><span class="prog"><i style="width:${d/n*100}%"></i></span></span>
+    <span class="sxc">${d}/${n}</span></button>`}).join('')}</div>
+  </div>`;
+}
+function vSection(){
+  const x=SECTIONS[sec],all=SC(sec),np=Math.ceil(all.length/PER_PAGE);if(spg>=np)spg=np-1;
+  const cs=all.slice(spg*PER_PAGE,spg*PER_PAGE+PER_PAGE),done=pageDone(me,sec);
+  return `<div class="sec">
+  <button class="btn ghost sm" data-back="1" style="align-self:flex-start">◀ ÍNDICE</button>
   <div class="pagehd">
-    <button class="arrow" data-pg="-1" aria-label="Página anterior">◀</button>
-    <div class="ttl"><div class="lbl">PÁGINA ${page+1} DE 10</div><h2 style="color:${p.c}">${esc(p.t.toUpperCase())}</h2><div class="who">${esc(p.who)} · ${done}/10</div></div>
-    <button class="arrow" data-pg="1" aria-label="Página siguiente">▶</button>
+    <button class="arrow" data-pg="-1" aria-label="Anterior">◀</button>
+    <div class="ttl"><div class="lbl">SECCIÓN ${sec+1} · PÁG ${spg+1}/${np}</div><h2 style="color:${x.c}">${esc(x.t.toUpperCase())}</h2><div class="who">${esc(x.who)} · ${done}/${all.length}</div></div>
+    <button class="arrow" data-pg="1" aria-label="Siguiente">▶</button>
   </div>
-  <div class="prog" style="--pc:${p.c}"><i style="width:${done*10}%"></i></div>
+  <div class="prog" style="--pc:${x.c}"><i style="width:${done/all.length*100}%"></i></div>
   <div class="grid" id="grid">${cs.map(c=>{const n=cnt(me,c.id);
     if(n>0)return `<button class="slotbtn" data-card="${c.id}" aria-label="${esc(cname(c))}">${cardHTML(c,n)}</button>`;
     const oth=cnt(other(),c.id)>1;
-    return `<button class="slot" data-card="${c.id}"><span class="n">${String(c.num).padStart(3,'0')}</span><span class="t">${esc(cname(c))}</span>${oth?`<span class="have">${esc(nm(other()).toUpperCase())} LA TIENE</span>`:''}</button>`;}).join('')}</div>
-  <div class="dots">${PAGES.map((_,i)=>`<button data-go="${i}" class="${pageDone(me,i)===10?'full':''}" aria-current="${i===page}" aria-label="Página ${i+1}">${i+1}</button>`).join('')}</div>
+    return `<button class="slot${c.r==='M'?' myslot':''}" data-card="${c.id}"><span class="n">${String(c.num).padStart(3,'0')}</span><span class="t">${esc(cname(c))}</span>${oth?`<span class="have">${esc(nm(other()).toUpperCase())} LA TIENE</span>`:''}</button>`;}).join('')}</div>
+  ${np>1?`<div class="dots">${Array.from({length:np},(_,i)=>{const pc=all.slice(i*PER_PAGE,i*PER_PAGE+PER_PAGE);const f=pc.every(c=>cnt(me,c.id)>0);return `<button data-go="${i}" class="${f?'full':''}" aria-current="${i===spg}" aria-label="Página ${i+1}">${i+1}</button>`}).join('')}</div>`:''}
   </div>`;
 }
+function flip(d){const np=Math.ceil(SC(sec).length/PER_PAGE);spg+=d;
+  if(spg<0){sec=(sec-1+SECTIONS.length)%SECTIONS.length;spg=Math.ceil(SC(sec).length/PER_PAGE)-1;}
+  else if(spg>=np){sec=(sec+1)%SECTIONS.length;spg=0;}
+  sfx.blip();render();}
 
 /* ===== Vista: Sobres ===== */
 function vSobres(){
@@ -400,12 +467,12 @@ function vSobres(){
   <div class="box"><div class="stock">
     <div class="minipack" aria-hidden="true"></div>
     <div style="flex:1;min-width:0"><div class="lbl">Sobres guardados</div><div class="big">${pl.packs||0}</div>
-    <div class="muted">Hoy abriste ${ot} de ${cap()} · 4 láminas por sobre</div></div>
+    <div class="muted">Hoy abriste ${ot} de ${cap()} · ${PER_PACK} láminas por sobre</div></div>
     <button class="btn red" id="open" ${canOpen?'':'disabled'}>ABRIR SOBRE</button>
   </div>${!canOpen&&ot>=cap()?'<p class="muted" style="margin:12px 0 0">Llegaste al tope de hoy. Mañana se reinicia.</p>':''}</div>
 
-  <div class="box row"><div class="grow"><div class="lbl">Sobre diario</div>
-    <div style="font-size:24px;margin-top:6px">${daily?'¡Tu sobre de hoy está listo!':'Ya lo reclamaste. Vuelve mañana.'}</div></div>
+  <div class="box row"><div class="grow"><div class="lbl">Regalo diario</div>
+    <div style="font-size:24px;margin-top:6px">${daily?`¡Tus ${DAILY} sobres de hoy están listos!`:'Ya los reclamaste. Vuelve mañana.'}</div></div>
     <button class="btn" id="daily" ${daily?'':'disabled'}>RECLAMAR</button></div>
 
   <div class="box row"><div class="grow"><div class="lbl">Canje de repetidas</div>
@@ -447,22 +514,22 @@ function vCambios(){
 
 /* ===== Vista: Marcador ===== */
 function vMarcador(){
-  const col=w=>{const u=uniq(w),lg=BYR.L.filter(c=>cnt(w,c.id)).length,pages=PAGES.filter((_,i)=>pageDone(w,i)===10).length;
-    return `<div class="box"><div class="lbl">${esc(nm(w))}${w===me?' (tú)':''}</div><div class="pct">${u}%</div>
-      <div class="prog" style="--pc:${w==='matias'?'var(--blu)':'#e8609a'}"><i style="width:${u}%"></i></div>
-      <div class="muted" style="margin-top:10px">${u}/100 láminas · ★ ${lg}/5 legendarias · ${pages} página${pages===1?'':'s'} completa${pages===1?'':'s'} · ${P(w).opened||0} sobres abiertos</div></div>`;};
+  const col=w=>{const u=uniq(w),lg=BYR.L.filter(c=>cnt(w,c.id)).length,my=BYR.M.filter(c=>cnt(w,c.id)).length,pages=SECTIONS.filter((_,i)=>secFull(w,i)).length;
+    return `<div class="box"><div class="lbl">${esc(nm(w))}${w===me?' (tú)':''}</div><div class="pct">${Math.round(u/CARDS.length*100)}%</div>
+      <div class="prog" style="--pc:${w==='matias'?'var(--blu)':'#e8609a'}"><i style="width:${u/CARDS.length*100}%"></i></div>
+      <div class="muted" style="margin-top:10px">${u}/${CARDS.length} láminas · ★ ${lg}/${BYR.L.length} legendarias · ✦ ${my}/${BYR.M.length} míticas · ${pages} sección${pages===1?'':'es'} completa${pages===1?'':'s'} · ${P(w).opened||0} sobres abiertos</div></div>`;};
   return `<div class="sec"><div class="score">${col('matias')}${col('polola')}</div>
-  <div class="box"><div class="lbl" style="margin-bottom:4px">Por página</div>
+  <div class="box"><div class="lbl" style="margin-bottom:4px">Por sección</div>
   ${PAGES.map((p,i)=>`<div class="pr"><div class="nm" style="color:${p.c}">${i+1}. ${esc(p.t)}</div>
-     <div class="prog" style="--pc:var(--blu)"><i style="width:${pageDone('matias',i)*10}%"></i></div><div class="v">${esc(nm('matias').slice(0,3).toUpperCase())} ${pageDone('matias',i)}</div>
-     <div class="prog" style="--pc:#e8609a"><i style="width:${pageDone('polola',i)*10}%"></i></div><div class="v">${esc(nm('polola').slice(0,3).toUpperCase())} ${pageDone('polola',i)}</div></div>`).join('')}
+     <div class="prog" style="--pc:var(--blu)"><i style="width:${pageDone('matias',i)/SC(i).length*100}%"></i></div><div class="v">${esc(nm('matias').slice(0,3).toUpperCase())} ${pageDone('matias',i)}</div>
+     <div class="prog" style="--pc:#e8609a"><i style="width:${pageDone('polola',i)/SC(i).length*100}%"></i></div><div class="v">${esc(nm('polola').slice(0,3).toUpperCase())} ${pageDone('polola',i)}</div></div>`).join('')}
   </div></div>`;
 }
 
 /* ===== Vista: Taller (solo Mati) ===== */
 let resetArm=false;
 function vTaller(){
-  const cs=CARDS.filter(c=>c.page===tallerPage);
+  const cs=SC(tallerPage);
   return `<div class="sec">
   <div class="box"><div class="lbl">Jugar como (para probar)</div><div class="row" style="margin-top:10px">
     ${WHO.map(w=>`<button class="btn ${me===w?'':'ghost'} sm" data-as="${w}">${esc(nm(w).toUpperCase())}</button>`).join('')}</div></div>
@@ -484,18 +551,18 @@ function vTaller(){
 }
 
 /* ===== Acciones ===== */
-function draw(){const r=Math.random()*100,k=r<2?'L':r<8?'B':r<30?'R':'C',l=BYR[k];return l[Math.floor(Math.random()*l.length)];}
+function draw(){const r=Math.random()*100;let acc=0,k='C';for(const x of ['M','L','B','R','C']){acc+=RAR[x].p;if(r<acc){k=x;break;}}const l=BYR[k];return l[Math.floor(Math.random()*l.length)];}
 function openPack(){
   const pl=P(me);if((pl.packs||0)<1||openedToday(me)>=cap())return;
   const owned={...(pl.owned||{})},upd={},drawn=[],before=PAGES.map((_,i)=>pageDone(me,i));
-  for(let i=0;i<4;i++){const c=draw(),was=owned[c.id]||0;drawn.push({c,isNew:was===0});owned[c.id]=was+1;upd[c.id]=owned[c.id];}
-  const done=PAGES.map((_,i)=>i).filter(i=>before[i]<10&&CARDS.filter(c=>c.page===i&&owned[c.id]).length===10);
+  for(let i=0;i<PER_PACK;i++){const c=draw(),was=owned[c.id]||0;drawn.push({c,isNew:was===0});owned[c.id]=was+1;upd[c.id]=owned[c.id];}
+  const done=SECTIONS.map((_,i)=>i).filter(i=>before[i]<SC(i).length&&SC(i).every(c=>owned[c.id]));
   patchPlayer(me,{owned:upd,packs:(pl.packs||1)-1,openedDay:today(),openedToday:openedToday(me)+1,opened:(pl.opened||0)+1});
   showPack(drawn,done);
 }
 function showPack(drawn,done){
   const ov=$('ov'),inn=$('ovin');ov.hidden=false;ov.className='ov';document.body.classList.add('ov-open');
-  inn.innerHTML=`<div class="pack" id="pk"><div class="strip"><i id="pkst"></i></div><div class="body"><div class="pix">NUESTRO<br>ÁLBUM<br>RETRO</div><div class="muted">4 láminas</div></div></div>
+  inn.innerHTML=`<div class="pack" id="pk"><div class="strip"><i id="pkst"></i></div><div class="body"><div class="pix">NUESTRO<br>ÁLBUM<br>RETRO</div><div class="muted">${PER_PACK} láminas</div></div></div>
     <div class="hint">DESLIZA O TOCA<br>PARA ABRIR</div>`;
   const pk=$('pk'),st=$('pkst');let prog=0,sx=null,gone=false;
   const setP=v=>{prog=Math.min(1,v);st.style.width=prog*100+'%';if(prog>=1)torn();};
@@ -508,16 +575,17 @@ function showPack(drawn,done){
       <div class="row" id="pkdone" hidden></div>`;
     let left=drawn.length;
     inn.querySelectorAll('.fc').forEach(b=>b.onclick=()=>{if(b.classList.contains('on'))return;b.classList.add('on');const d=drawn[+b.dataset.i];
-      if(d.c.r==='L'){ov.classList.add('shake','flash');sfx.fan();if(navigator.vibrate)navigator.vibrate([80,60,80,60,200]);setTimeout(()=>ov.classList.remove('shake','flash'),1100);}
+      if(d.c.r==='M'){ov.classList.add('shake','flash','mythic');sfx.myth();if(navigator.vibrate)navigator.vibrate([120,60,120,60,120,60,400]);setTimeout(()=>ov.classList.remove('shake','flash'),1600);}
+      else if(d.c.r==='L'){ov.classList.add('shake','flash');sfx.fan();if(navigator.vibrate)navigator.vibrate([80,60,80,60,200]);setTimeout(()=>ov.classList.remove('shake','flash'),1100);}
       else if(d.c.r==='B'||d.c.r==='R')sfx.rare();else sfx.flip();
       if(--left===0){const r=$('pkdone');r.hidden=false;const more=(P(me).packs||0)>0&&openedToday(me)<cap();
         r.innerHTML=`<button class="btn" id="pkok">AL ÁLBUM</button>${more?'<button class="btn red" id="pkmore">ABRIR OTRO</button>':''}`;
-        $('pkok').onclick=()=>{closeOv();tab='album';page=drawn[0].c.page;render();celebrate(done);};
+        $('pkok').onclick=()=>{closeOv();tab='album';const c0=drawn[0].c;sec=c0.page;spg=Math.floor(SC(sec).indexOf(c0)/PER_PAGE);render();celebrate(done);};
         const m=$('pkmore');if(m)m.onclick=()=>{celebrate(done);openPack();};}
     });
   }
 }
-function celebrate(done){if(done&&done.length){setTimeout(()=>{sfx.fan();toast('¡PÁGINA COMPLETA! '+done.map(i=>PAGES[i].t).join(' · '));},250);}}
+function celebrate(done){if(done&&done.length){setTimeout(()=>{sfx.fan();toast('¡SECCIÓN COMPLETA! '+done.map(i=>SECTIONS[i].t).join(' · '));},250);}}
 function closeOv(){const ov=$('ov');ov.hidden=true;ov.className='ov';$('ovin').innerHTML='';document.body.classList.remove('ov-open');if(dirty){dirty=false;render();}}
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov'&&!$('pk')&&!document.querySelector('.fc'))closeOv();});
 
@@ -533,10 +601,10 @@ function showCard(id){
   const a=$('ask');if(a)a.onclick=()=>{tWant=id;tGive=null;closeOv();tab='cambios';render();toast('Ahora elige qué repetida le das');};
 }
 
-async function claimDaily(){if(P(me).lastDaily===today())return;sfx.ok();await patchPlayer(me,{packs:(P(me).packs||0)+1,lastDaily:today()});toast('+1 sobre diario');}
+async function claimDaily(){if(P(me).lastDaily===today())return;sfx.ok();await patchPlayer(me,{packs:(P(me).packs||0)+DAILY,lastDaily:today()});toast(`+${DAILY} sobres diarios`);}
 async function swapDups(){
   if(dups(me)<5)return;const upd={};let need=5;
-  for(const k of ['C','R','B','L'])for(const c of BYR[k]){while(need>0&&(upd[c.id]??cnt(me,c.id))>1){upd[c.id]=(upd[c.id]??cnt(me,c.id))-1;need--;}}
+  for(const k of ['C','R','B','L','M'])for(const c of BYR[k]){while(need>0&&(upd[c.id]??cnt(me,c.id))>1){upd[c.id]=(upd[c.id]??cnt(me,c.id))-1;need--;}}
   sfx.ok();await patchPlayer(me,{owned:upd,packs:(P(me).packs||0)+1});toast('Canjeaste 5 repetidas por 1 sobre');
 }
 async function redeem(){
@@ -594,10 +662,12 @@ const nameT={};
 function debounced(key,fn){clearTimeout(nameT[key]);nameT[key]=setTimeout(fn,600);}
 function bind(){
   const m=$('main');
-  m.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{page=(page+ +b.dataset.pg+10)%10;sfx.blip();render();});
-  m.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{page=+b.dataset.go;sfx.blip();render();});
+  m.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>flip(+b.dataset.pg));
+  m.querySelectorAll('[data-sec]').forEach(b=>b.onclick=()=>{sec=+b.dataset.sec;spg=0;sfx.blip();render();scrollTo(0,0);});
+  m.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{sec=-1;sfx.blip();render();scrollTo(0,0);});
+  m.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{spg=+b.dataset.go;sfx.blip();render();});
   m.querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>{sfx.blip();showCard(b.dataset.card);});
-  const g=$('grid');if(g){let x0=null;g.ontouchstart=e=>x0=e.touches[0].clientX;g.ontouchend=e=>{if(x0==null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>60){page=(page+(d<0?1:-1)+10)%10;sfx.blip();render();}x0=null;};}
+  const g=$('grid');if(g){let x0=null;g.ontouchstart=e=>x0=e.touches[0].clientX;g.ontouchend=e=>{if(x0==null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>60)flip(d<0?1:-1);x0=null;};}
   const on=(id,fn)=>{const el=$(id);if(el)el.onclick=fn;};
   on('open',()=>{ac();sfx.blip();openPack();});on('daily',claimDaily);on('swap',swapDups);on('redeem',redeem);on('propose',propose);on('mkcode',mkCode);on('reset',doReset);
   on('logout',()=>{signOut(auth);});
@@ -608,7 +678,7 @@ function bind(){
   m.querySelectorAll('[data-can]').forEach(b=>b.onclick=()=>{setTrade(b.dataset.can,{status:'cancelled'});});
   m.querySelectorAll('[data-as]').forEach(b=>b.onclick=()=>{me=b.dataset.as;tGive=tWant=null;sfx.ok();render();});
   WHO.forEach(w=>{const i=$('nm-'+w);if(i)i.oninput=()=>debounced('nm'+w,()=>patchCfg({names:{[w]:i.value.trim()||(w==='matias'?'Mati':'Marcelita')}}));});
-  const ci=$('capin');if(ci)ci.oninput=()=>debounced('cap',()=>patchCfg({cap:Math.max(1,Math.min(20,+ci.value||3))}));
+  const ci=$('capin');if(ci)ci.oninput=()=>debounced('cap',()=>patchCfg({packCap:Math.max(1,Math.min(20,+ci.value||4))}));
   const tp=$('tpage');if(tp)tp.onchange=()=>{tallerPage=+tp.value;render();};
   m.querySelectorAll('[data-cn]').forEach(i=>i.oninput=()=>debounced('cn'+i.dataset.cn,()=>patchCfg({cards:{[i.dataset.cn]:{name:i.value.trim()}}})));
   m.querySelectorAll('[data-up]').forEach(i=>i.onchange=()=>upload(i.dataset.up,i.files[0]));
@@ -652,7 +722,7 @@ onAuthStateChanged(auth,user=>{
     if(user)signOut(auth);
     S.ready=false;$('login').hidden=false;$('app').hidden=true;return;
   }
-  realMe=me=USERS[u];owner=realMe===OWNER;tab='album';page=0;
+  realMe=me=USERS[u];owner=realMe===OWNER;tab='album';sec=-1;spg=0;
   $('login').hidden=true;$('app').hidden=false;render();startAll();
 });
 
