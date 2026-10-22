@@ -194,6 +194,28 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 .toast{position:fixed;left:50%;top:calc(80px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:60;background:var(--yel);color:#1a1300;font-family:var(--pix);font-size:10px;line-height:1.6;padding:12px 14px;box-shadow:0 0 0 3px #000,6px 6px 0 3px #0008;max-width:calc(100% - 32px);text-align:center}
 .banner{background:#3a2a10;box-shadow:0 0 0 2px var(--yel);padding:8px 12px;color:#ffe6a6}
 
+
+/* pantalla de inicio */
+.title{position:fixed;inset:0;z-index:65;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;
+  padding:calc(20px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));
+  background-image:radial-gradient(circle at 50% 30%,#3a2d6e 0,transparent 60%),radial-gradient(1px 1px at 12% 18%,#fff8 50%,transparent 51%),radial-gradient(1px 1px at 82% 12%,#fff6 50%,transparent 51%),radial-gradient(2px 2px at 70% 78%,#f4c43088 50%,transparent 51%),radial-gradient(1px 1px at 25% 84%,#fff7 50%,transparent 51%),radial-gradient(2px 2px at 90% 45%,#ff5fd277 50%,transparent 51%),radial-gradient(1px 1px at 8% 55%,#fff6 50%,transparent 51%)}
+.tin{width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.tin .logo i{width:14px;height:14px}
+.tlogo{font-size:clamp(20px,7vw,28px);line-height:1.45;margin:0;color:var(--yel);text-shadow:3px 3px 0 #e0483e,6px 6px 0 #0008}
+.tfan{position:relative;width:100%;height:clamp(150px,42vw,200px)}
+.tcard{position:absolute;top:8px;left:50%;width:clamp(86px,25vw,116px);margin-left:calc(clamp(86px,25vw,116px)/-2);animation:bob 3s ease-in-out infinite}
+.tcard .back{aspect-ratio:5/7}
+.tcard.t0{transform:translateX(-72%) rotate(-12deg);animation-delay:-.4s}
+.tcard.t1{z-index:2;top:0;animation-delay:-1.2s}
+.tcard.t2{transform:translateX(72%) rotate(12deg);animation-delay:-2s}
+.tcard.t1{transform:none}
+@keyframes bob{50%{margin-top:-8px}}
+.tstat{display:flex;flex-direction:column;gap:4px;font-size:22px;color:var(--mute)}
+.tstat b{font-weight:400;color:var(--ink);font-size:26px}
+.tgift{font-family:var(--pix);font-size:9px;color:var(--yel);margin-top:4px;animation:blink 1s steps(2) infinite}
+.tstart{font-size:13px;padding:16px 26px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.05)}}
+.tfoot{font-size:18px;color:var(--mute)}
 /* índice de secciones */
 .idx{display:grid;gap:12px}
 @media (min-width:640px){.idx{grid-template-columns:1fr 1fr}}
@@ -241,6 +263,16 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
     <div class="err" id="lerr" role="alert"></div>
     <button class="btn red" id="lbtn" type="submit">ENTRAR</button>
   </form>
+</section>
+<section class="title" id="title" hidden>
+  <div class="tin">
+    <div class="logo" aria-hidden="true"><i style="background:var(--red)"></i><i style="background:var(--yel)"></i><i style="background:var(--grn)"></i><i style="background:var(--blu)"></i></div>
+    <h1 class="pix tlogo">NUESTRO<br>ÁLBUM<br>RETRO</h1>
+    <div class="tfan" id="tfan" aria-hidden="true"></div>
+    <div class="tstat" id="tstat">Cargando tu colección…</div>
+    <button class="btn red tstart" id="tstart">PRESS START</button>
+    <div class="tfoot">♥ Mati &amp; Marcelita ♥</div>
+  </div>
 </section>
 <div id="app" hidden>
 <header><div class="hd">
@@ -303,18 +335,18 @@ const SECTIONS=[
  {t:'Dragones',who:'De los dos',c:'#a35bf0',k:[...R_('L','Gran Dragón'),...R_('B','Dragón oscuro'),...R_('R','Dragón de fuego','Dragón de hielo','Dragón nocturno'),
    ...R_('C','Dragón de agua','Dragón de tierra','Dragón venenoso')]},
  {t:'Comida',who:'De los dos',c:'#d9a521',k:[...R_('B','Completos'),...R_('R','Pizza','Hamburguesas','Tacos','Empanadas'),
-   ...R_('C','Papas fritas','Fajitas','Fideos','Lasaña','Carne asada','Cazuela de vacuno','Helados','Churros','Frutillas con chocolate','Sopaipillas','Mote con huesillo','Pie de limón')]},
+   ...R_('C','Papas fritas','Fajitas','Fideos','Lasaña','Carne asada','Cazuela de vacuno','Helados','Churros','Frutillas con chocolate','Chocolate','Sopaipillas','Mote con huesillo','Pie de limón')]},
  {t:'Bandas y artistas',who:'De los dos',c:'#e0507a',k:[...R_('L','Pearl Jam'),...R_('B',"Guns N' Roses",'Metallica'),...R_('R','Linkin Park','Los Bunkers','Ricardo Arjona','Bad Bunny'),
    ...R_('C','Limp Bizkit','Chico Trujillo','Entremares','Amar Azul','Dread Mar I','Luis Miguel','Luis Fonsi','Cristian Castro','Mon Laferte')]},
  {t:'Fechas importantes',who:'De los dos',c:'#ff5fd2',k:R_('M','Cumpleaños de Mati','Cumpleaños de Marcelita','Nuestro aniversario')},
  {t:'Festividades',who:'De los dos',c:'#2bb3c0',k:[...R_('L','Navidad'),...R_('B','Fiestas Patrias'),...R_('R','Halloween','Año Nuevo','San Valentín'),
    ...R_('C','Pascua de Resurrección','Carnaval','Cumpleaños','Día de los Muertos')]},
  {t:'Películas y series',who:'De los dos',c:'#7f6cf0',k:[...R_('B','Piratas del Caribe'),...R_('R','Shingeki no Kyojin','The Last Kingdom','Aladdín'),
-   ...R_('C','El cuento de la criada','Rapunzel','Tinkerbell','Tarzán','Tierra de osos','Una noche en el museo')]},
+   ...R_('C','El cuento de la criada','Rapunzel','Tinkerbell','Tarzán','Tierra de osos','Una noche en el museo','Moana','La princesa y el sapo')]},
  {t:'Gatos',who:'De los dos',c:'#e8a05c',k:[...R_('L','Rusia','Nino','Hades'),...R_('R','Los tres juntos')]},
  {t:'Personajes',who:'De los dos',c:'#5a8fd8',k:[...R_('B','Eren Jaeger','Jack Sparrow','Genio'),
-   ...R_('R','Levi Ackerman','Mikasa Ackerman','Uhtred','Rapunzel','Flynn Rider','Aladdín','Kenai','Larry Daley'),
-   ...R_('C','Armin Arlert','Titán Colosal','Rey Alfred','June Osborne','Will Turner','Elizabeth Swann','Capitán Barbossa','Davy Jones','Pascal','Tinkerbell','Tarzán','Jane Porter','Jasmín','Abú','Jafar','Koda','Teddy Roosevelt','Rexy','Dexter')]},
+   ...R_('R','Levi Ackerman','Mikasa Ackerman','Uhtred','Rapunzel','Flynn Rider','Aladdín','Kenai','Larry Daley','Maui'),
+   ...R_('C','Armin Arlert','Titán Colosal','Rey Alfred','June Osborne','Will Turner','Elizabeth Swann','Capitán Barbossa','Davy Jones','Pascal','Tinkerbell','Tarzán','Jane Porter','Jasmín','Abú','Jafar','Koda','Teddy Roosevelt','Rexy','Dexter','Moana','Hei Hei','Te Fiti','Tiana','Príncipe Naveen','Dr. Facilier')]},
  {t:'Amigos',who:'De los dos',c:'#7cb83a',k:[...R_('R','Coni','Andrea','Jared','Cota'),...R_('C','Pinu','Nati','Fabi','Sam','Diego','Javi','Dani')]},
  {t:'Panoramas',who:'De los dos',c:'#26a69a',k:[...R_('L','Familia de Legos'),...R_('B','Conciertos Piedra Negra'),...R_('R','Salida a Viña','Juegos inflables en Villarrica','Playa con los chiquillos'),
    ...R_('C','Fonda Doña Florinda','Salida nocturna en la Ñipa','Idas al cine','Creación de pixelarts')]},
@@ -381,6 +413,7 @@ const sfx={
   no:()=>[300,200].forEach((f,i)=>tone(f,.1,i*.1))
 };
 /* Soundtrack 8-bit original: 8 compases en La menor, se repite */
+let song=null;
 const Music=(()=>{
   const mf=m=>440*Math.pow(2,(m-69)/12),BPM=108,ST=60/BPM/2;
   const CH=[[57,60,64],[53,57,60],[48,52,55],[55,59,62],[53,57,60],[55,59,62],[52,55,59],[57,60,64]];
@@ -397,9 +430,45 @@ const Music=(()=>{
       if(m)tone(mf(m),ST*1.7,next,'square',.03,MG);
       if(i%2===1)hat(next);
       next+=ST;step++;}}
-  return{start(){if(timer||!musicOn||document.hidden)return;const a=ac();if(!a)return;next=0;timer=setInterval(sched,30);},
-         stop(){clearInterval(timer);timer=null;}};
+  return{start(){if(!musicOn||document.hidden)return;if(song){song.play().catch(()=>{});return;}if(timer)return;const a=ac();if(!a)return;next=0;timer=setInterval(sched,30);},
+         stop(){clearInterval(timer);timer=null;if(song)song.pause();},
+         playing(){return !!timer||!!(song&&!song.paused);}};
 })();
+
+/* ===== Canción de fondo propia (guardada en Firebase, en partes) ===== */
+const bytesToB64=u=>{let x='';for(let i=0;i<u.length;i+=0x8000)x+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(x);};
+const b64ToBytes=b=>{const x=atob(b),u=new Uint8Array(x.length);for(let i=0;i<x.length;i++)u[i]=x.charCodeAt(i);return u;};
+let songMeta=null,songV=null;
+async function loadSong(meta){
+  songMeta=meta&&meta.n?meta:null;
+  const v=songMeta?songMeta.v:null;if(v===songV)return;songV=v;
+  const was=Music.playing();Music.stop();
+  if(song){try{URL.revokeObjectURL(song.src)}catch(e){}song=null;}
+  if(songMeta){
+    let blob=null;const key='./_song-'+v;
+    try{const c=await caches.open('album-song');const r=await c.match(key);if(r)blob=await r.blob();}catch(e){}
+    if(!blob){try{const parts=[];for(let i=0;i<songMeta.n;i++){const d=await getDoc(doc(fs,'music','c'+i));parts.push(b64ToBytes(d.data().b));}
+        blob=new Blob(parts,{type:songMeta.type||'audio/mpeg'});
+        try{const c=await caches.open('album-song');for(const k of await c.keys())await c.delete(k);await c.put(key,new Response(blob));}catch(e){}
+      }catch(e){console.warn('song',e);songV=null;}}
+    if(blob&&songV===v){song=new Audio(URL.createObjectURL(blob));song.loop=true;song.volume=.55;}
+  }
+  if(was||musicOn)Music.start();
+  if(tab==='taller')safeRender();
+}
+async function uploadSong(file){
+  if(!file)return;
+  if(file.size>8e6){toast('La canción pesa más de 8 MB. Prueba con un MP3 más liviano.');return;}
+  try{
+    toast('Subiendo canción… 0%');const buf=new Uint8Array(await file.arrayBuffer()),CH=700000,n=Math.ceil(buf.length/CH);
+    for(let i=0;i<n;i++){await setDoc(doc(fs,'music','c'+i),{b:bytesToB64(buf.subarray(i*CH,(i+1)*CH))});toast(`Subiendo canción… ${Math.round((i+1)/n*100)}%`);}
+    await setDoc(doc(fs,'music','meta'),{n,type:file.type||'audio/mpeg',name:file.name.replace(/\.[^.]+$/,''),v:Date.now().toString(36)});
+    sfx.ok();toast('Canción lista. Suena en los dos celulares.');
+  }catch(e){toast('No se pudo subir la canción. Revisa tu conexión.');}
+}
+async function removeSong(){
+  try{const n=songMeta?songMeta.n:0;await setDoc(doc(fs,'music','meta'),{n:0,v:Date.now().toString(36)});for(let i=0;i<n;i++)await deleteDoc(doc(fs,'music','c'+i));toast('Volvió el soundtrack 8-bit');}catch(e){toast('No se pudo quitar la canción');}
+}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){Music.stop();if(AC)AC.suspend().catch(()=>{});}else if(AC){AC.resume().catch(()=>{});if(musicOn)Music.start();}});
 $('mute').onclick=()=>{muted=!muted;try{localStorage.setItem('alb_mute',muted?'1':'0')}catch(e){}hdr();if(!muted)sfx.blip();};
 $('music').onclick=()=>{musicOn=!musicOn;try{localStorage.setItem('alb_music',musicOn?'1':'0')}catch(e){}if(musicOn)Music.start();else Music.stop();hdr();};
@@ -451,7 +520,7 @@ function render(){hdr();navR();
   bind();
 }
 let dirty=false;
-function safeRender(){if(!$('ov').hidden){dirty=true;hdr();return;}const a=document.activeElement;if(tab==='taller'&&a&&a.tagName==='INPUT'&&a.type!=='file'){hdr();navR();return;}render();}
+function safeRender(){renderTitle();if(!$('ov').hidden){dirty=true;hdr();return;}const a=document.activeElement;if(tab==='taller'&&a&&a.tagName==='INPUT'&&a.type!=='file'){hdr();navR();return;}render();}
 
 /* ===== Vista: Álbum ===== */
 function vAlbum(){return sec<0?vIndex():vSection();}
@@ -571,6 +640,10 @@ function vTaller(){
     <div class="edl">${cs.map(c=>`<div class="edrow"><div class="mc">${cardHTML(c)}</div>
       <input type="text" id="cn-${c.id}" data-cn="${c.id}" value="${esc(cname(c))}" aria-label="Nombre lámina ${c.num}">
       <label class="btn ghost sm" style="cursor:pointer">${cimg(c)?'CAMBIAR':'FOTO'}<input type="file" accept="image/*" data-up="${c.id}" hidden></label></div>`).join('')}</div></div>
+  <div class="box"><div class="lbl">Canción de fondo</div>
+    <div style="font-size:22px;margin:8px 0 4px">♫ ${songMeta?esc(songMeta.name||'Canción propia'):'Soundtrack 8-bit original'}</div>
+    <p class="muted" style="margin:0 0 12px">Sube un MP3 de hasta 8 MB. Suena en bucle en los dos celulares y se guarda solo para ustedes.</p>
+    <div class="row"><label class="btn sm" style="cursor:pointer">${songMeta?'CAMBIAR CANCIÓN':'SUBIR CANCIÓN'}<input type="file" accept="audio/*" id="songin" hidden></label>${songMeta?'<button class="btn ghost sm" id="songrm">VOLVER AL 8-BIT</button>':''}</div></div>
   <div class="box"><div class="lbl">Códigos secretos (para esconder en la vida real)</div>
     <div class="row" style="margin-top:10px"><span class="muted">Sobres:</span><input type="number" id="cpacks" min="1" max="10" value="1" style="width:80px"><button class="btn sm" id="mkcode">CREAR CÓDIGO</button></div>
     <div style="margin-top:10px">${S.codes.length?S.codes.map(c=>`<div class="row" style="justify-content:space-between"><span class="pix" style="font-size:12px;color:${c.used?'var(--mute)':'var(--yel)'}">${esc(c.id)}</span><span class="muted">${c.packs} sobre${c.packs>1?'s':''} · ${c.used?'usado':'sin usar'}</span></div>`).join(''):'<p class="empty">Todavía no hay códigos.</p>'}</div></div>
@@ -699,7 +772,8 @@ function bind(){
   m.querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>{sfx.blip();showCard(b.dataset.card);});
   const on=(id,fn)=>{const el=$(id);if(el)el.onclick=fn;};
   on('open',()=>{ac();sfx.blip();openPack();});on('daily',claimDaily);on('swap',swapDups);on('redeem',redeem);on('propose',propose);on('mkcode',mkCode);on('reset',doReset);
-  on('logout',()=>{signOut(auth);});
+  on('logout',()=>{signOut(auth);});on('songrm',removeSong);
+  const si=$('songin');if(si)si.onchange=()=>uploadSong(si.files[0]);
   m.querySelectorAll('[data-give]').forEach(b=>b.onclick=()=>{tGive=tGive===b.dataset.give?null:b.dataset.give;sfx.blip();render();});
   m.querySelectorAll('[data-want]').forEach(b=>b.onclick=()=>{tWant=tWant===b.dataset.want?null:b.dataset.want;sfx.blip();render();});
   m.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{b.disabled=true;accept(b.dataset.acc);});
@@ -712,6 +786,19 @@ function bind(){
   m.querySelectorAll('[data-cn]').forEach(i=>i.oninput=()=>debounced('cn'+i.dataset.cn,()=>patchCfg({cards:{[i.dataset.cn]:{name:i.value.trim()}}})));
   m.querySelectorAll('[data-up]').forEach(i=>i.onchange=()=>upload(i.dataset.up,i.files[0]));
 }
+
+
+/* ===== Pantalla de inicio ===== */
+function renderTitle(){
+  if($('title').hidden)return;
+  const mine=CARDS.filter(c=>cnt(me,c.id)>0),order={M:0,L:1,B:2,R:3,C:4};
+  const best=mine.sort((a,b)=>order[a.r]-order[b.r]).slice(0,3);
+  $('tfan').innerHTML=[0,1,2].map(i=>`<div class="tcard t${i}">${best[i]?cardHTML(best[i]):'<div class="back">?</div>'}</div>`).join('');
+  if(!S.ready){$('tstat').textContent='Cargando tu colección…';return;}
+  const daily=P(me).lastDaily!==today();
+  $('tstat').innerHTML=`<b>¡Hola, ${esc(nm(me))}!</b><span>${uniq(me)}/${CARDS.length} láminas · ${P(me).packs||0} sobre${(P(me).packs||0)===1?'':'s'}</span>${daily?'<span class="tgift">¡TIENES TU REGALO DIARIO!</span>':''}`;
+}
+$('tstart').onclick=()=>{ac();sfx.fan();$('title').hidden=true;$('app').hidden=false;tab=P(me).lastDaily!==today()?'sobres':'album';sec=-1;render();scrollTo(0,0);if(musicOn)Music.start();};
 
 /* ===== Inicio de sesión ===== */
 $('loginform').addEventListener('submit',async e=>{
@@ -733,6 +820,7 @@ function startAll(){
     S.ex[w]=s.exists();const d=s.exists()?s.data():{};S.players[w]={...def(),...d,owned:{...(d.owned||{})}};
     if(!s.exists()&&w===realMe&&!s.metadata.fromCache&&!S['made'+w]){S['made'+w]=1;setDoc(doc(fs,'players',w),def(),{merge:true});}
     S.ready=true;safeRender();},err)));
+  unsubs.push(onSnapshot(doc(fs,'music','meta'),x=>loadSong(x.exists()?x.data():null),err));
   unsubs.push(onSnapshot(doc(fs,'config','main'),s=>{const d=s.exists()?s.data():{};S.cfg={...defCfg(),...d,names:{...defCfg().names,...(d.names||{})},cards:{...(d.cards||{})}};safeRender();},err));
   unsubs.push(onSnapshot(collection(fs,'cardimg'),s=>{const m={};s.docs.forEach(x=>{const d=x.data();if(d&&d.d)m[x.id]=d.d;});S.imgs=m;safeRender();},err));
   unsubs.push(onSnapshot(query(collection(fs,'trades'),orderBy('at','desc'),limit(40)),s=>{
@@ -752,7 +840,7 @@ onAuthStateChanged(auth,user=>{
     S.ready=false;$('login').hidden=false;$('app').hidden=true;return;
   }
   realMe=me=USERS[u];owner=realMe===OWNER;tab='album';sec=-1;spg=0;
-  $('login').hidden=true;$('app').hidden=false;render();startAll();
+  $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
