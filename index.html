@@ -232,6 +232,12 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 .tbk small{font-family:var(--pix);font-size:9px;color:var(--mute)}
 .glare{position:absolute;inset:0;pointer-events:none;z-index:4;mix-blend-mode:soft-light}
 .mc.tv{border:0;padding:0;background:none;cursor:zoom-in}
+.ccover{position:absolute;inset:0;background:center/cover no-repeat;image-rendering:pixelated}
+.covrow{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:10px;background:#0f0c1f;box-shadow:0 0 0 2px var(--line)}
+.cvmini{width:52px;height:52px;flex:none;background:var(--pc) center/cover no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;font-family:var(--pix);font-size:11px;color:#fff;box-shadow:inset 0 0 0 3px #0003}
+.cvprev{background:linear-gradient(180deg,#3d3768,#29244a);padding:12px;box-shadow:0 0 0 3px #4a4382;display:flex;flex-direction:column;gap:10px}
+.cvprev .art{aspect-ratio:1/1;max-width:100%;background:var(--pc) center/cover no-repeat;image-rendering:pixelated;box-shadow:inset 0 0 0 3px #0003}
+.cvt{font-size:22px;line-height:1}
 /* índice tipo cartuchos */
 .coll{display:flex;flex-direction:column;gap:10px}
 .cpct{font-family:var(--pix);font-size:18px;color:var(--grn)}
@@ -411,6 +417,7 @@ const CBY=Object.fromEntries(CARDS.map(c=>[c.id,c]));
 const BYR={C:[],R:[],B:[],L:[],M:[]};CARDS.forEach(c=>BYR[c.r].push(c));
 const SCN=SECTIONS.map((_,i)=>CARDS.filter(c=>c.page===i));
 const SC=i=>SCN[i];
+const covId=i=>'cover~'+kslug(SECTIONS[i].t);
 
 /* ===== Estado ===== */
 const def=()=>({owned:{},packs:3,lastDaily:'',openedDay:'',openedToday:0,opened:0,trades:0});
@@ -574,7 +581,7 @@ function safeRender(){renderTitle();if(!$('ov').hidden){dirty=true;hdr();return;
 /* ===== Vista: Álbum ===== */
 function vAlbum(){return sec<0?vIndex():vSection();}
 function vIndex(){
-  const tot=uniq(me),N=CARDS.length,order={M:0,L:1,B:2,R:3,C:4};
+  const tot=uniq(me),N=CARDS.length,order={M:0,L:1,B:2,R:3,C:4};const covOf=i=>S.imgs[covId(i)];
   const thumb=c=>{if(!c)return '<i class="q">?</i>';const im=cimg(c);
     if(!im&&c.lt)return `<i class="ltt"><b>${esc(c.lt)}</b></i>`;
     return `<i style="background-image:url('${im||sprite(c)}')${im?'':';background-size:70% auto;background-color:color-mix(in srgb,'+SECTIONS[c.page].c+' 25%,#0c0a1a)'}"></i>`;};
@@ -590,7 +597,7 @@ function vIndex(){
     const th=[best[1],best[0],best[2]].map(thumb).join('');
     return `<button class="cart${full?' done':''}" data-sec="${i}" style="--pc:${x.c}">
       <span class="cridge" aria-hidden="true"></span>
-      <span class="clabel"><span class="cnum">${String(i+1).padStart(2,'0')}</span>${full?'<span class="cstamp">★ COMPLETA</span>':''}<span class="cthumbs">${th}</span></span>
+      <span class="clabel"><span class="cnum">${String(i+1).padStart(2,'0')}</span>${full?'<span class="cstamp">★ COMPLETA</span>':''}${covOf(i)?`<span class="ccover" style="background-image:url('${covOf(i)}')"></span>`:`<span class="cthumbs">${th}</span>`}</span>
       <span class="ctitle">${esc(x.t)}</span>
       <span class="cwho">${esc(x.who)}</span>
       <span class="cfoot"><span class="cbar"><i style="width:${d/n*100}%"></i></span><span class="ccount">${d}/${n}</span></span>
@@ -699,6 +706,9 @@ function vTaller(){
     <div class="row" style="margin-top:12px"><span class="muted">Tope de sobres por día</span><input type="number" id="capin" min="1" max="20" value="${cap()}" style="width:90px"></div></div>
   <div class="box"><div class="lbl">Láminas</div>
     <div class="row" style="margin:10px 0 14px"><select id="tpage">${PAGES.map((p,i)=>`<option value="${i}" ${i===tallerPage?'selected':''}>${i+1}. ${esc(p.t)}</option>`).join('')}</select></div>
+    <div class="covrow" style="--pc:${SECTIONS[tallerPage].c}"><div class="cvmini"${S.imgs[covId(tallerPage)]?` style="background-image:url('${S.imgs[covId(tallerPage)]}')"`:''}>${S.imgs[covId(tallerPage)]?'':String(tallerPage+1).padStart(2,'0')}</div>
+      <div class="grow" style="min-width:0"><div class="lbl">Portada de la sección</div><div class="muted">${S.imgs[covId(tallerPage)]?'Con foto':'Sin foto: se ven tus mejores láminas'}</div></div>
+      <label class="btn sm" style="cursor:pointer">${S.imgs[covId(tallerPage)]?'CAMBIAR':'PORTADA'}<input type="file" accept="image/*" data-cover="${tallerPage}" hidden></label></div>
     <div class="edl">${cs.map(c=>`<div class="edrow"><button class="mc tv" data-tview="${c.id}" aria-label="Ver ${esc(cname(c))} en grande">${cardHTML(c)}</button>
       <input type="text" id="cn-${c.id}" data-cn="${c.id}" value="${esc(cname(c))}" aria-label="Nombre lámina ${c.num}">
       <label class="btn ghost sm" style="cursor:pointer">${cimg(c)?'CAMBIAR':'FOTO'}<input type="file" accept="image/*" data-up="${c.id}" hidden></label></div>`).join('')}</div></div>
@@ -771,12 +781,6 @@ function bindTilt(){
   w.onpointermove=e=>{if(!last)return;ry+=(e.clientX-last.x)*.7;rx-=(e.clientY-last.y)*.45;rx=Math.max(-40,Math.min(40,rx));last={x:e.clientX,y:e.clientY};frame();};
   const up=()=>{if(!last)return;last=null;ry=Math.round(ry/360)*360;rx=0;t.style.transition='transform .7s cubic-bezier(.2,.9,.3,1.25)';apply();if(navigator.vibrate)navigator.vibrate(8);};
   w.onpointerup=up;w.onpointercancel=up;
-  /* inclinar el celular también mueve la lámina */
-  const ori=e=>{if(last||e.beta==null)return;if(!base)base={b:e.beta,g:e.gamma};
-    const tx=Math.max(-18,Math.min(18,(e.beta-base.b)*-.6)),ty=Math.max(-22,Math.min(22,(e.gamma-base.g)*.8));
-    t.style.transition='transform .12s linear';rx=tx;ry=Math.round(ry/360)*360+ty;frame();};
-  window.addEventListener('deviceorientation',ori);
-  tiltOff=()=>window.removeEventListener('deviceorientation',ori);
   apply();
 }
 function showTallerCard(id){
@@ -872,9 +876,9 @@ function pixelFrom(sm){
   return big.toDataURL('image/png');
 }
 let pend=null;
-async function upload(id,file){
+async function upload(id,file,coverSec){
   if(!file)return;
-  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,z:1,px:0,py:0,ratio:5/7};showPx();}catch(e){toast('No se pudo abrir esa foto');}
+  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec};showPx();}catch(e){toast('No se pudo abrir esa foto');}
 }
 /* dibuja la foto con el zoom y la posición elegidos */
 function drawSrc(W,H){
@@ -892,9 +896,10 @@ let pxRaf=0;
 function redrawPx(){if(pxRaf)return;pxRaf=requestAnimationFrame(()=>{pxRaf=0;if(!pend)return;pend.url=makeURL();const el=$('ovin').querySelector('.zoom .art');if(el){el.style.backgroundImage=`url('${pend.url}')`;el.classList.remove('spr');}});}
 function showPx(){
   if(!pend)return;const c=CBY[pend.id];
+  const prev=pend.cover?`<div class="cvprev" style="--pc:${SECTIONS[pend.sec].c}"><div class="art"></div><div class="cvt">${esc(SECTIONS[pend.sec].t)}</div></div>`:cardHTML(c,0,'data:image/gif;base64,R0lGODlhAQABAAAAACw=');
   $('ov').hidden=false;document.body.classList.add('ov-open');
-  $('ovin').innerHTML=`<div class="ovtitle pix">AJUSTA TU FOTO</div>
-    <div class="zoom pxedit">${cardHTML(c,0,'data:image/gif;base64,R0lGODlhAQABAAAAACw=')}</div>
+  $('ovin').innerHTML=`<div class="ovtitle pix">${pend.cover?'AJUSTA LA PORTADA':'AJUSTA TU FOTO'}</div>
+    <div class="zoom pxedit">${prev}</div>
     <div class="hint" style="animation:none">ARRASTRA PARA MOVER · PELLIZCA PARA ZOOM</div>
     <div class="box" style="width:100%;display:flex;flex-direction:column;gap:12px">
       <label class="row"><span class="lbl" style="width:80px">Tamaño</span><input type="range" id="pxz" min="0" max="1000" style="flex:1;accent-color:var(--yel)"></label>
@@ -925,7 +930,7 @@ function showPx(){
   $('ovin').querySelectorAll('[data-pxd]').forEach(b=>b.onclick=()=>{pxDet=b.dataset.pxd;try{localStorage.setItem('alb_pxd',pxDet)}catch(e){}sfx.blip();showPx();});
   $('pxcancel').onclick=()=>{URL.revokeObjectURL(pend.img.src);pend=null;closeOv();};
   $('pxsave').onclick=async()=>{const b=$('pxsave');b.disabled=true;b.textContent='GUARDANDO…';const id=pend.id,url=makeURL();
-    try{await setDoc(doc(fs,'cardimg',id),{d:url});URL.revokeObjectURL(pend.img.src);pend=null;closeOv();sfx.ok();toast('Foto lista');}
+    try{await setDoc(doc(fs,'cardimg',id),{d:url});URL.revokeObjectURL(pend.img.src);pend=null;closeOv();sfx.ok();toast(id.startsWith('cover~')?'Portada lista':'Foto lista');}
     catch(e){b.disabled=false;b.textContent='GUARDAR';toast('No se pudo guardar. Revisa tu conexión.');}};
   redrawPx();
 }
@@ -955,6 +960,7 @@ function bind(){
   const tp=$('tpage');if(tp)tp.onchange=()=>{tallerPage=+tp.value;render();};
   m.querySelectorAll('[data-cn]').forEach(i=>i.oninput=()=>debounced('cn'+i.dataset.cn,()=>patchCfg({cards:{[i.dataset.cn]:{name:i.value.trim()}}})));
   m.querySelectorAll('[data-tview]').forEach(b=>b.onclick=()=>{sfx.blip();showTallerCard(b.dataset.tview);});
+  m.querySelectorAll('[data-cover]').forEach(i=>i.onchange=()=>{const f=i.files[0];i.value='';upload(covId(+i.dataset.cover),f,+i.dataset.cover);});
   m.querySelectorAll('[data-up]').forEach(i=>i.onchange=()=>{const f=i.files[0];i.value='';upload(i.dataset.up,f);});
 }
 
@@ -1014,7 +1020,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='12';
+const APP_VERSION='13';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
