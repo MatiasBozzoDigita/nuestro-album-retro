@@ -228,14 +228,14 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 #main.anim .grid.fromR>*{animation-name:fromR}#main.anim .grid.fromL>*{animation-name:fromL}
 #main.anim .prog i,#main.anim .cbar i{animation:grow .9s cubic-bezier(.2,.8,.3,1) .2s backwards}
 @keyframes cin{from{opacity:0;transform:translateY(18px)}}
-@keyframes cardin{from{opacity:0;transform:translateY(24px) scale(.85) rotate(-3deg)}}
-@keyframes fromR{from{opacity:0;transform:translateX(40px) rotate(4deg)}}
-@keyframes fromL{from{opacity:0;transform:translateX(-40px) rotate(-4deg)}}
+@keyframes cardin{from{opacity:0;transform:translateY(22px) scale(.9)}}
+@keyframes fromR{from{opacity:0;transform:translateX(36px)}}
+@keyframes fromL{from{opacity:0;transform:translateX(-36px)}}
 @keyframes grow{from{width:0}}
 .cart.ins{animation:insc .3s ease-in forwards!important;z-index:3}
 @keyframes insc{35%{transform:translateY(-10px) scale(1.04)}100%{transform:translateY(46px) scale(.82);opacity:0}}
-#main.boot .pagehd,#main.boot .grid{animation:bootf .45s steps(5)}
-@keyframes bootf{0%{filter:brightness(3) saturate(0)}60%{filter:brightness(1.6)}100%{filter:none}}
+#main.boot .pagehd h2{animation:bootf .45s steps(4)}
+@keyframes bootf{0%,50%{opacity:.2}25%,75%{opacity:1}}
 .bn,.coin b,.hearts span{display:inline-block}
 .bump{animation:bump .4s ease-out}
 @keyframes bump{40%{transform:scale(1.4);color:#fff}}
@@ -769,15 +769,16 @@ function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTime
 const HROWS=['.XX.XX.','XXXXXXX','XXXXXXX','.XXXXX.','..XXX..','...X...'];
 const HEART=[0,1,2].map(k=>pxsvg(HROWS,(ch,x,y)=>ch!=='X'?null:(k===2||(k===1&&x<=3))?(x===1&&y===1?'#ffd0dc':'#ff2e63'):'#3a3468'));
 const COIN=pxsvg(['..XXX..','.XYYYX.','XYYOYYX','XYYOYYX','XYYOYYX','.XYYYX.','..XXX..'],ch=>({X:'#b86a00',Y:'#ffd23f',O:'#fff4b0'})[ch]||null);
-let hudPrev={p:null,u:null};
+let hudPrev={p:null,u:null},hudHtml={h:'',p:''};
 function roll(el,from,to,fmt,dur=600){if(!el)return;const t0=performance.now();const f=ts=>{const k=Math.min(1,(ts-t0)/dur),v=Math.round(from+(to-from)*(1-Math.pow(1-k,3)));el.textContent=fmt(v);if(k<1)requestAnimationFrame(f);};el.textContent=fmt(from);requestAnimationFrame(f);el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');}
 function hdr(){
   const u=uniq(me),N=CARDS.length,f=u/N*10;
   $('hdp').textContent=me==='matias'?'1P':'2P';$('hdp').classList.toggle('p2',me!=='matias');
   $('hdname').textContent=S.ready?nm(me).toUpperCase():'CARGANDO…';
   const pk=P(me).packs||0;
-  $('hdhearts').innerHTML=Array.from({length:10},(_,i)=>HEART[f>=i+1?2:f>=i+.5?1:0]).join('')+`<span>${u}/${N}</span>`;
-  $('hdpacks').innerHTML=COIN+`<b>×${pk}</b>`;
+  const hh=Array.from({length:10},(_,i)=>HEART[f>=i+1?2:f>=i+.5?1:0]).join('')+`<span>${u}/${N}</span>`,ph=COIN+`<b>×${pk}</b>`;
+  if(hh!==hudHtml.h){hudHtml.h=hh;$('hdhearts').innerHTML=hh;}
+  if(ph!==hudHtml.p){hudHtml.p=ph;$('hdpacks').innerHTML=ph;}
   if(S.ready){if(hudPrev.p!=null&&hudPrev.p!==pk)roll($('hdpacks').querySelector('b'),hudPrev.p,pk,v=>'×'+v);
     if(hudPrev.u!=null&&hudPrev.u!==u)roll($('hdhearts').querySelector('span'),hudPrev.u,u,v=>v+'/'+N);
     hudPrev={p:pk,u};}
@@ -788,21 +789,31 @@ function navR(){
   const daily=P(me).lastDaily!==today();
   const items=[['album','ÁLBUM'],['sobres','SOBRES',daily?'!':''],['cambios','CAMBIOS',pend||''],['marcador','MARCADOR']];
   if(owner)items.push(['taller','TALLER']);
-  $('nav').innerHTML=items.map(([k,l,d])=>`<button data-tab="${k}" aria-current="${tab===k}">${l}${d?`<span class="dot">${d}</span>`:''}</button>`).join('');
+  const h=items.map(([k,l,d])=>`<button data-tab="${k}" aria-current="${tab===k}">${l}${d?`<span class="dot">${d}</span>`:''}</button>`).join('');
+  if(h!==navHtml){navHtml=h;$('nav').innerHTML=h;}
 }
+let navHtml='';
 document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('.btn,.arrow,nav button');if(!b||b.disabled)return;b.classList.remove('tap');void b.offsetWidth;b.classList.add('tap');setTimeout(()=>b.classList.remove('tap'),320);},true);
 $('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.tab==='album')sec=-1;tab=b.dataset.tab;sfx.blip();animNext=true;flipDir='';render();scrollTo(0,0);};
 
 const TABT={album:'#3b5bd6',sobres:'#d0453a',cambios:'#1f9e7a',marcador:'#c08a20',taller:'#6b6488'};
 let animNext=false;
 function render(){hdr();navR();BG.tint(tab==='album'&&sec>=0?SECTIONS[sec].c:(TABT[tab]||'#3b5bd6'));
-  if(!S.ready){$('main').innerHTML='<p class="boot">CARGANDO ÁLBUM…</p>';return;}
-  const mm=$('main');mm.innerHTML=({album:vAlbum,sobres:vSobres,cambios:vCambios,marcador:vMarcador,taller:vTaller}[tab]||vAlbum)();
-  mm.classList.toggle('anim',animNext);
-  if(animNext&&tab==='album'&&sec<0){const bn=mm.querySelector('.bn');if(bn)roll(bn,0,+bn.textContent,v=>v,700);}
+  if(!S.ready){mainHtml='';$('main').innerHTML='<p class="boot">CARGANDO ÁLBUM…</p>';return;}
+  const mm=$('main'),html=({album:vAlbum,sobres:vSobres,cambios:vCambios,marcador:vMarcador,taller:vTaller}[tab]||vAlbum)();
+  if(!animNext){
+    if(html===mainHtml)return;                       /* nada cambió: no se toca la pantalla */
+    const wait=animUntil-Date.now();                 /* hay una animación en curso: esperar a que termine */
+    if(wait>0){clearTimeout(lateT);lateT=setTimeout(render,wait+30);return;}
+    mm.classList.remove('anim');
+  }
+  mainHtml=html;mm.innerHTML=html;
+  if(animNext){mm.classList.remove('anim');void mm.offsetWidth;mm.classList.add('anim');animUntil=Date.now()+1300;clearTimeout(lateT);
+    if(tab==='album'&&sec<0){const bn=mm.querySelector('.bn');if(bn)roll(bn,0,+bn.textContent,v=>v,700);}}
   animNext=false;
   bind();
 }
+let mainHtml='',animUntil=0,lateT=0;
 let dirty=false;
 function safeRender(){renderTitle();if(!$('ov').hidden){dirty=true;hdr();return;}const a=document.activeElement;if(tab==='taller'&&a&&a.tagName==='INPUT'&&a.type!=='file'){hdr();navR();return;}render();}
 
@@ -1262,7 +1273,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='16';
+const APP_VERSION='17';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
