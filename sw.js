@@ -1,5 +1,5 @@
 // Service worker: la app abre aunque la conexión esté lenta, y siempre busca la versión nueva primero.
-const CACHE = 'album-v19';
+const CACHE = 'album-v20';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
