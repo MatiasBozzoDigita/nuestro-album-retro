@@ -1304,14 +1304,14 @@ function bindTilt(){
   apply();
 }
 /* Quita el fondo oscuro que quedó en fotos subidas antes (relleno desde los bordes) */
-async function stripDark(url){
+async function stripDark(url,thr=52){
   const img=new Image();img.src=url;await img.decode();
   const W=img.width,H=img.height,k=W===448?8:W===456?6:W===400?10:Math.max(1,Math.round(W/56));
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.drawImage(img,0,0);
   const id=g.getImageData(0,0,W,H),d=id.data,cw=Math.floor(W/k),ch=Math.floor(H/k);
   const lum=(x,y)=>{const i=((y*k+(k>>1))*W+(x*k+(k>>1)))*4;return d[i+3]<20?-1:(d[i]*.3+d[i+1]*.59+d[i+2]*.11);};
   const L=new Float32Array(cw*ch);for(let y=0;y<ch;y++)for(let x=0;x<cw;x++)L[y*cw+x]=lum(x,y);
-  const dark=v=>v>=0&&v<52,rm=new Uint8Array(cw*ch),q=[];
+  const dark=v=>v>=0&&v<thr,rm=new Uint8Array(cw*ch),q=[];
   for(let x=0;x<cw;x++){q.push(x,(ch-1)*cw+x);}for(let y=0;y<ch;y++){q.push(y*cw,y*cw+cw-1);}
   while(q.length){const p=q.pop();if(rm[p])continue;const v=L[p];if(!(dark(v)||v<0))continue;rm[p]=1;const x=p%cw,y=(p/cw)|0;
     if(x>0)q.push(p-1);if(x<cw-1)q.push(p+1);if(y>0)q.push(p-cw);if(y<ch-1)q.push(p+cw);}
@@ -1324,14 +1324,16 @@ async function stripDark(url){
     for(let yy=y*k;yy<y*k+k;yy++)for(let xx=x*k;xx<x*k+k;xx++)d[(yy*W+xx)*4+3]=0;}
   g.putImageData(id,0,0);return {url:cv.toDataURL('image/png'),n};
 }
+const FXLV={suave:26,medio:52,fuerte:80};let fxLv='suave';
 async function fixBgView(id){
   const c=CBY[id];if(tiltOff){tiltOff();tiltOff=null;}
   ovShow(`<div class="ovtitle pix">QUITANDO FONDO…</div>`);
-  let r;try{r=await stripDark(S.imgs[id]);}catch(e){toast('No se pudo procesar esa foto');return showTallerCard(id);}
-  if(!r.n){toast('Esta foto no tiene fondo oscuro para quitar');return showTallerCard(id);}
-  ovShow(`<div class="ovtitle pix">ASÍ QUEDARÍA</div><div class="zoom">${cardHTML(c,0,r.url)}</div>
-    <p class="muted" style="margin:0;text-align:center">Se borró el fondo oscuro que tocaba los bordes. Si se comió parte del personaje, descártalo.</p>
-    <div class="row"><button class="btn" id="fxok">GUARDAR</button><button class="btn ghost" id="fxno">DESCARTAR</button></div>`);
+  let r;try{r=await stripDark(S.imgs[id],FXLV[fxLv]);}catch(e){toast('No se pudo procesar esa foto');return showTallerCard(id);}
+  ovShow(`<div class="ovtitle pix">ASÍ QUEDARÍA</div><div class="zoom">${cardHTML(c,0,r.n?r.url:S.imgs[id])}</div>
+    <div class="box" style="width:100%"><div class="row"><span class="lbl" style="flex:1">Intensidad</span>${Object.keys(FXLV).map(k=>`<button class="btn sm ${fxLv===k?'':'ghost'}" data-fxl="${k}">${k.toUpperCase()}</button>`).join('')}</div>
+    <p class="muted" style="margin:10px 0 0">${r.n?'Si se come parte del personaje, prueba SUAVE. Si queda fondo negro, prueba FUERTE.':'Con esta intensidad no se encontró fondo para quitar. Prueba FUERTE.'}</p></div>
+    <div class="row"><button class="btn" id="fxok" ${r.n?'':'disabled'}>GUARDAR</button><button class="btn ghost" id="fxno">DESCARTAR</button></div>`);
+  $('ovin').querySelectorAll('[data-fxl]').forEach(b=>b.onclick=()=>{fxLv=b.dataset.fxl;sfx.blip();fixBgView(id);});
   $('fxno').onclick=()=>showTallerCard(id);
   $('fxok').onclick=async()=>{const b=$('fxok');b.disabled=true;try{await setDoc(doc(fs,'cardimg',id),{d:r.url});sfx.ok();toast('Fondo quitado');showTallerCard(id);}catch(e){b.disabled=false;toast('No se pudo guardar');}};
 }
@@ -1583,7 +1585,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='26';
+const APP_VERSION='27';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
