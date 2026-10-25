@@ -508,6 +508,8 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 /* fondo de rayos detrás de fotos sin fondo */
 .card{--bd:radial-gradient(circle at 50% 58%,#ffffffb0 0,#ffffff00 34%),repeating-conic-gradient(from 4deg at 50% 58%,color-mix(in srgb,var(--pc) 70%,var(--f1)) 0 10deg,color-mix(in srgb,var(--pc) 62%,#000) 10deg 20deg),radial-gradient(circle at 50% 58%,transparent 40%,#00000088 100%)}
 .card .art.ph{background-size:cover,100% 100%,100% 100%,100% 100%;background-position:center}
+
+.aist{font-size:17px;color:var(--yel);min-height:1em}
 </style>
 </head>
 <body>
@@ -1436,7 +1438,7 @@ function pixelFrom(sm){
 let pend=null;
 async function upload(id,file,coverSec){
   if(!file)return;
-  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec,alpha:hasAlpha(img)};showPx();}catch(e){toast('No se pudo abrir esa foto');}
+  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,file,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec,alpha:hasAlpha(img)};showPx();}catch(e){toast('No se pudo abrir esa foto');}
 }
 /* dibuja la foto con el zoom y la posición elegidos */
 function drawSrc(W,H){
@@ -1449,6 +1451,20 @@ function zMin(){const img=pend.img,r=pend.ratio,W=1,H=1/r;return Math.min(W/img.
 function makeURL(){
   if(pxOn){const W=PXDET[pxDet];return pixelFrom(drawSrc(W,Math.max(1,Math.round(W/pend.ratio))));}
   const cv=drawSrc(400,Math.round(400/pend.ratio));return pend.alpha?cv.toDataURL('image/png'):cv.toDataURL('image/jpeg',.8);
+}
+/* Quitar fondo con IA (se descarga una sola vez, ~40 MB, y corre en el propio dispositivo) */
+let BGR=null;
+async function aiRemove(){
+  if(!pend||!pend.file)return;const b=$('pxai');if(b)b.disabled=true;
+  const set=t=>{const e=$('aist');if(e)e.textContent=t;};
+  try{
+    set('Cargando la IA…');
+    if(!BGR)BGR=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
+    const out=await BGR.removeBackground(pend.file,{model:'isnet_quint8',output:{format:'image/png'},
+      progress:(key,cur,tot)=>{if(String(key).startsWith('fetch')&&tot)set(`Descargando la IA (solo la primera vez)… ${Math.round(cur/tot*100)}%`);else set('Recortando al personaje…');}});
+    const img=await loadImg(out);
+    if(!pend)return;pend.prevImg=pend.img;pend.img=img;pend.alpha=true;pend.ai=true;sfx.ok();showPx();
+  }catch(e){console.warn('IA',e);set('');if(b)b.disabled=false;toast('No se pudo quitar el fondo con IA. Revisa tu conexión e intenta de nuevo.');}
 }
 function hasAlpha(img){const c=document.createElement('canvas');c.width=48;c.height=48;const g=c.getContext('2d');g.drawImage(img,0,0,48,48);const d=g.getImageData(0,0,48,48).data;for(let i=3;i<d.length;i+=4)if(d[i]<245)return true;return false;}
 let pxRaf=0;
@@ -1463,6 +1479,8 @@ function showPx(){
     <div class="box" style="width:100%;display:flex;flex-direction:column;gap:12px">
       <label class="row"><span class="lbl" style="width:80px">Tamaño</span><input type="range" id="pxz" min="0" max="1000" style="flex:1;accent-color:var(--yel)"></label>
       <div class="row"><span class="lbl" style="flex:1">Posición</span><button class="btn ghost sm" id="pxfit">VER COMPLETA</button><button class="btn ghost sm" id="pxreset">CENTRAR</button></div>
+      <div class="row"><span class="lbl" style="flex:1">Fondo de la foto</span>${pend.ai?'<button class="btn ghost sm" id="pxaiu">DESHACER</button>':'<button class="btn blue sm" id="pxai">QUITAR FONDO CON IA</button>'}</div>
+      <div class="aist" id="aist">${pend.ai?'✔ Fondo quitado con IA':''}</div>
       <div class="row"><span class="lbl" style="flex:1">Filtro pixel 8-bit</span><button class="btn sm ${pxOn?'':'ghost'}" id="pxtog">${pxOn?'ACTIVADO':'DESACTIVADO'}</button></div>
       ${pxOn?`<div class="row"><span class="lbl" style="flex:1">Detalle</span>${Object.keys(PXDET).map(k=>`<button class="btn sm ${pxDet===k?'':'ghost'}" data-pxd="${k}">${k.toUpperCase()}</button>`).join('')}</div>`:''}
     </div>
@@ -1485,6 +1503,7 @@ function showPx(){
   const up=e=>{pts.delete(e.pointerId);pinch=null;last=pts.size===1?[...pts.values()][0]:null;};
   art.onpointerup=up;art.onpointercancel=up;
   art.onwheel=e=>{e.preventDefault();setZ(pend.z*(e.deltaY<0?1.08:1/1.08));};
+  {const ai=$('pxai');if(ai)ai.onclick=aiRemove;const au=$('pxaiu');if(au)au.onclick=()=>{pend.img=pend.prevImg;pend.ai=false;pend.alpha=hasAlpha(pend.img);sfx.blip();showPx();};}
   $('pxtog').onclick=()=>{pxOn=!pxOn;try{localStorage.setItem('alb_px',pxOn?'1':'0')}catch(e){}sfx.blip();showPx();};
   $('ovin').querySelectorAll('[data-pxd]').forEach(b=>b.onclick=()=>{pxDet=b.dataset.pxd;try{localStorage.setItem('alb_pxd',pxDet)}catch(e){}sfx.blip();showPx();});
   $('pxcancel').onclick=()=>{URL.revokeObjectURL(pend.img.src);pend=null;closeOv();};
@@ -1588,7 +1607,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='28';
+const APP_VERSION='29';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
