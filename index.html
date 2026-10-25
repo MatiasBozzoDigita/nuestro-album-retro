@@ -1304,34 +1304,37 @@ function bindTilt(){
   apply();
 }
 /* Quita el fondo oscuro que quedó en fotos subidas antes (relleno desde los bordes) */
-async function stripDark(url,thr=52){
+async function stripDark(url,lv='suave'){
   const img=new Image();img.src=url;await img.decode();
   const W=img.width,H=img.height,k=W===448?8:W===456?6:W===400?10:Math.max(1,Math.round(W/56));
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.drawImage(img,0,0);
   const id=g.getImageData(0,0,W,H),d=id.data,cw=Math.floor(W/k),ch=Math.floor(H/k);
-  const lum=(x,y)=>{const i=((y*k+(k>>1))*W+(x*k+(k>>1)))*4;return d[i+3]<20?-1:(d[i]*.3+d[i+1]*.59+d[i+2]*.11);};
-  const L=new Float32Array(cw*ch);for(let y=0;y<ch;y++)for(let x=0;x<cw;x++)L[y*cw+x]=lum(x,y);
-  const dark=v=>v>=0&&v<thr,rm=new Uint8Array(cw*ch),q=[];
-  for(let x=0;x<cw;x++){q.push(x,(ch-1)*cw+x);}for(let y=0;y<ch;y++){q.push(y*cw,y*cw+cw-1);}
-  while(q.length){const p=q.pop();if(rm[p])continue;const v=L[p];if(!(dark(v)||v<0))continue;rm[p]=1;const x=p%cw,y=(p/cw)|0;
+  /* color de cada bloque (centro del pixel grande) */
+  const C=new Int32Array(cw*ch),Lm=new Float32Array(cw*ch);
+  for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){const i=((y*k+(k>>1))*W+(x*k+(k>>1)))*4,p=y*cw+x;
+    if(d[i+3]<20){C[p]=-1;Lm[p]=-1;continue;}C[p]=(d[i]>>3)<<10|(d[i+1]>>3)<<5|(d[i+2]>>3);Lm[p]=d[i]*.3+d[i+1]*.59+d[i+2]*.11;}
+  /* colores que dominan el borde = colores del fondo */
+  const freq=new Map(),bd=[];for(let x=0;x<cw;x++)bd.push(x,(ch-1)*cw+x);for(let y=1;y<ch-1;y++)bd.push(y*cw,y*cw+cw-1);
+  bd.forEach(p=>{if(C[p]>=0)freq.set(C[p],(freq.get(C[p])||0)+1);});
+  const tot=bd.length,minF={suave:.12,medio:.05,fuerte:.02}[lv]||.12,maxL={suave:70,medio:95,fuerte:130}[lv]||70;
+  const bg=new Set([...freq].filter(([c,n])=>n/tot>=minF).map(([c])=>c).filter(c=>{const p=C.indexOf(c);return Lm[p]<maxL;}));
+  const isBg=p=>C[p]<0||bg.has(C[p]);
+  const rm=new Uint8Array(cw*ch),q=bd.slice();
+  while(q.length){const p=q.pop();if(rm[p]||!isBg(p))continue;rm[p]=1;const x=p%cw,y=(p/cw)|0;
     if(x>0)q.push(p-1);if(x<cw-1)q.push(p+1);if(y>0)q.push(p-cw);if(y<ch-1)q.push(p+cw);}
-  /* conservar un borde de 1 pixel alrededor del personaje para que no pierda su contorno */
-  const keep=new Uint8Array(cw*ch);
-  for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){const p=y*cw+x;if(!rm[p]||L[p]<0)continue;
-    const nb=[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>{const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=cw||Y>=ch)return false;const qq=Y*cw+X;return !rm[qq]&&!dark(L[qq]);});
-    if(nb)keep[p]=1;}
-  let n=0;for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){const p=y*cw+x;if(!rm[p]||keep[p])continue;n++;
+  /* bloques sueltos del fondo atrapados entre el personaje y el borde: se dejan como están */
+  let n=0;for(let p=0;p<cw*ch;p++){if(!rm[p]||C[p]<0)continue;n++;const x=p%cw,y=(p/cw)|0;
     for(let yy=y*k;yy<y*k+k;yy++)for(let xx=x*k;xx<x*k+k;xx++)d[(yy*W+xx)*4+3]=0;}
   g.putImageData(id,0,0);return {url:cv.toDataURL('image/png'),n};
 }
-const FXLV={suave:26,medio:52,fuerte:80};let fxLv='suave';
+const FXLV={suave:1,medio:1,fuerte:1};let fxLv='suave';
 async function fixBgView(id){
   const c=CBY[id];if(tiltOff){tiltOff();tiltOff=null;}
   ovShow(`<div class="ovtitle pix">QUITANDO FONDO…</div>`);
-  let r;try{r=await stripDark(S.imgs[id],FXLV[fxLv]);}catch(e){toast('No se pudo procesar esa foto');return showTallerCard(id);}
+  let r;try{r=await stripDark(S.imgs[id],fxLv);}catch(e){toast('No se pudo procesar esa foto');return showTallerCard(id);}
   ovShow(`<div class="ovtitle pix">ASÍ QUEDARÍA</div><div class="zoom">${cardHTML(c,0,r.n?r.url:S.imgs[id])}</div>
     <div class="box" style="width:100%"><div class="row"><span class="lbl" style="flex:1">Intensidad</span>${Object.keys(FXLV).map(k=>`<button class="btn sm ${fxLv===k?'':'ghost'}" data-fxl="${k}">${k.toUpperCase()}</button>`).join('')}</div>
-    <p class="muted" style="margin:10px 0 0">${r.n?'Si se come parte del personaje, prueba SUAVE. Si queda fondo negro, prueba FUERTE.':'Con esta intensidad no se encontró fondo para quitar. Prueba FUERTE.'}</p></div>
+    <p class="muted" style="margin:10px 0 0">${r.n?'Borra solo los colores del borde de la foto. Si queda fondo, sube la intensidad; si se come al personaje, bájala.':'Con esta intensidad no se encontró fondo para quitar. Prueba FUERTE.'}</p></div>
     <div class="row"><button class="btn" id="fxok" ${r.n?'':'disabled'}>GUARDAR</button><button class="btn ghost" id="fxno">DESCARTAR</button></div>`);
   $('ovin').querySelectorAll('[data-fxl]').forEach(b=>b.onclick=()=>{fxLv=b.dataset.fxl;sfx.blip();fixBgView(id);});
   $('fxno').onclick=()=>showTallerCard(id);
@@ -1585,7 +1588,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='27';
+const APP_VERSION='28';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
