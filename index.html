@@ -274,7 +274,7 @@ nav button[aria-current="true"]{background:var(--tc,#e0483e);color:#fff;text-sha
 .mt{position:relative;aspect-ratio:5/7;border:0;padding:0;background:none;perspective:600px}
 .mt i{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .3s;box-shadow:0 0 0 2px #000a}
 .mt .mb{background:repeating-conic-gradient(var(--panel2) 0 25%,var(--panel) 0 50%) 0 0/10px 10px;box-shadow:0 0 0 2px var(--line)}
-.mt .mf{transform:rotateY(180deg);background:#0c0a1a center/cover no-repeat;image-rendering:pixelated}
+.mt .mf{transform:rotateY(180deg);background:center/cover no-repeat;background-color:var(--panel2);image-rendering:pixelated}
 .mt .mf.spr{background-size:70% auto;background-color:var(--panel2)}
 .mt.up .mb{transform:rotateY(180deg)}.mt.up .mf{transform:rotateY(0)}
 .mt.ok .mf{box-shadow:0 0 0 3px var(--grn),0 0 12px 2px #3fae6a88}
@@ -417,7 +417,7 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .clabel{position:relative;aspect-ratio:1/1;max-width:100%;background:var(--pc);box-shadow:inset 0 0 0 3px #0000002e,inset 0 -26px 0 #00000022;display:flex;align-items:flex-end;justify-content:center;padding:8px 8px 10px;overflow:hidden}
 .clabel::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#ffffff10 0 2px,transparent 2px 6px);pointer-events:none}
 .cthumbs{display:flex;gap:5px;width:100%;justify-content:center;align-items:flex-end}
-.cthumbs i{flex:0 0 29%;aspect-ratio:5/7;background:#0c0a1a center/cover no-repeat;image-rendering:pixelated;box-shadow:0 0 0 2px #000000a0,3px 3px 0 1px #00000055;display:flex;align-items:center;justify-content:center;font-style:normal}
+.cthumbs i{flex:0 0 29%;aspect-ratio:5/7;background:center/cover no-repeat;background-color:color-mix(in srgb,var(--pc) 55%,#000);image-rendering:pixelated;box-shadow:0 0 0 2px #000000a0,3px 3px 0 1px #00000055;display:flex;align-items:center;justify-content:center;font-style:normal}
 .cthumbs i:nth-child(2){flex-basis:34%;margin-bottom:6px}
 .cthumbs i.q{background:repeating-conic-gradient(var(--panel2) 0 25%,var(--panel) 0 50%) 0 0/8px 8px;font-family:var(--pix);font-size:11px;color:#ffffff66}
 .cthumbs i.ltt{background:radial-gradient(circle,#ff8fb0,#ff4f7b 55%,#8a1f45)}
@@ -504,6 +504,10 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .card.my::before{display:none}
 .card.my .rar i{background:none}
 .ov-open main .card.rM{animation-play-state:paused}
+
+/* fondo de rayos detrás de fotos sin fondo */
+.card{--bd:radial-gradient(circle at 50% 58%,#ffffffb0 0,#ffffff00 34%),repeating-conic-gradient(from 4deg at 50% 58%,color-mix(in srgb,var(--pc) 70%,var(--f1)) 0 10deg,color-mix(in srgb,var(--pc) 62%,#000) 10deg 20deg),radial-gradient(circle at 50% 58%,transparent 40%,#00000088 100%)}
+.card .art.ph{background-size:cover,100% 100%,100% 100%,100% 100%;background-position:center}
 </style>
 </head>
 <body>
@@ -1000,7 +1004,7 @@ function cardHTML(c,count=0,ovImg){
   return `<div class="card r${c.r}${hol?' holo':''}${c.r==='L'||c.r==='M'?' lg':''}${c.r==='M'?' my':''}" style="--pc:${sx.c};--rc:var(--c-${c.r})">
     <div class="cin">
       <div class="top"><span class="cno">${String(c.num).padStart(3,'0')}</span><span class="csec">${esc(sx.t)}</span><span class="gems">${'<i></i>'.repeat(RSTARS[c.r])}</span></div>
-      <div class="art${img?'':c.lt?' ltr':' spr'}" style="${img?`background-image:url('${img}')`:c.lt?'':`background-image:url('${sprite(c)}')`}">${!img&&c.lt?`<span class="lt">${esc(c.lt)}</span>`:''}${hol?'<div class="shine"></div>':''}</div>
+      <div class="art${img?' ph':c.lt?' ltr':' spr'}" style="${img?`background-image:url('${img}'),var(--bd)`:c.lt?'':`background-image:url('${sprite(c)}')`}">${!img&&c.lt?`<span class="lt">${esc(c.lt)}</span>`:''}${hol?'<div class="shine"></div>':''}</div>
       <div class="nm"><span>${esc(cname(c))}</span></div>
       <div class="rar">${RAR[c.r].n.toUpperCase()}</div>
     </div>
@@ -1299,13 +1303,46 @@ function bindTilt(){
   w.onpointerup=up;w.onpointercancel=up;
   apply();
 }
+/* Quita el fondo oscuro que quedó en fotos subidas antes (relleno desde los bordes) */
+async function stripDark(url){
+  const img=new Image();img.src=url;await img.decode();
+  const W=img.width,H=img.height,k=W===448?8:W===456?6:W===400?10:Math.max(1,Math.round(W/56));
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.drawImage(img,0,0);
+  const id=g.getImageData(0,0,W,H),d=id.data,cw=Math.floor(W/k),ch=Math.floor(H/k);
+  const lum=(x,y)=>{const i=((y*k+(k>>1))*W+(x*k+(k>>1)))*4;return d[i+3]<20?-1:(d[i]*.3+d[i+1]*.59+d[i+2]*.11);};
+  const L=new Float32Array(cw*ch);for(let y=0;y<ch;y++)for(let x=0;x<cw;x++)L[y*cw+x]=lum(x,y);
+  const dark=v=>v>=0&&v<52,rm=new Uint8Array(cw*ch),q=[];
+  for(let x=0;x<cw;x++){q.push(x,(ch-1)*cw+x);}for(let y=0;y<ch;y++){q.push(y*cw,y*cw+cw-1);}
+  while(q.length){const p=q.pop();if(rm[p])continue;const v=L[p];if(!(dark(v)||v<0))continue;rm[p]=1;const x=p%cw,y=(p/cw)|0;
+    if(x>0)q.push(p-1);if(x<cw-1)q.push(p+1);if(y>0)q.push(p-cw);if(y<ch-1)q.push(p+cw);}
+  /* conservar un borde de 1 pixel alrededor del personaje para que no pierda su contorno */
+  const keep=new Uint8Array(cw*ch);
+  for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){const p=y*cw+x;if(!rm[p]||L[p]<0)continue;
+    const nb=[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>{const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=cw||Y>=ch)return false;const qq=Y*cw+X;return !rm[qq]&&!dark(L[qq]);});
+    if(nb)keep[p]=1;}
+  let n=0;for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){const p=y*cw+x;if(!rm[p]||keep[p])continue;n++;
+    for(let yy=y*k;yy<y*k+k;yy++)for(let xx=x*k;xx<x*k+k;xx++)d[(yy*W+xx)*4+3]=0;}
+  g.putImageData(id,0,0);return {url:cv.toDataURL('image/png'),n};
+}
+async function fixBgView(id){
+  const c=CBY[id];if(tiltOff){tiltOff();tiltOff=null;}
+  ovShow(`<div class="ovtitle pix">QUITANDO FONDO…</div>`);
+  let r;try{r=await stripDark(S.imgs[id]);}catch(e){toast('No se pudo procesar esa foto');return showTallerCard(id);}
+  if(!r.n){toast('Esta foto no tiene fondo oscuro para quitar');return showTallerCard(id);}
+  ovShow(`<div class="ovtitle pix">ASÍ QUEDARÍA</div><div class="zoom">${cardHTML(c,0,r.url)}</div>
+    <p class="muted" style="margin:0;text-align:center">Se borró el fondo oscuro que tocaba los bordes. Si se comió parte del personaje, descártalo.</p>
+    <div class="row"><button class="btn" id="fxok">GUARDAR</button><button class="btn ghost" id="fxno">DESCARTAR</button></div>`);
+  $('fxno').onclick=()=>showTallerCard(id);
+  $('fxok').onclick=async()=>{const b=$('fxok');b.disabled=true;try{await setDoc(doc(fs,'cardimg',id),{d:r.url});sfx.ok();toast('Fondo quitado');showTallerCard(id);}catch(e){b.disabled=false;toast('No se pudo guardar');}};
+}
 function showTallerCard(id){
   const c=CBY[id];
   $('ov').hidden=false;document.body.classList.add('ov-open');
   $('ovin').innerHTML=`${tiltHTML(c)}
     <div class="box" style="width:100%;text-align:center"><div class="lbl">${esc(SECTIONS[c.page].t)} · ${RAR[c.r].n}</div>
       <div style="font-size:24px;margin-top:8px">${esc(cname(c))}</div><div class="muted">${cimg(c)?'Con foto':'Sin foto todavía'}</div></div>
-    <div class="row"><label class="btn" style="cursor:pointer">${cimg(c)?'CAMBIAR FOTO':'SUBIR FOTO'}<input type="file" accept="image/*" id="tvup" hidden></label><button class="btn ghost" id="cls">CERRAR</button></div>`;
+    <div class="row"><label class="btn" style="cursor:pointer">${cimg(c)?'CAMBIAR FOTO':'SUBIR FOTO'}<input type="file" accept="image/*" id="tvup" hidden></label>${cimg(c)?'<button class="btn blue" id="tvfix">QUITAR FONDO</button>':''}<button class="btn ghost" id="cls">CERRAR</button></div>`;
+  const fx=$('tvfix');if(fx)fx.onclick=()=>fixBgView(id);
   $('cls').onclick=closeOv;
   const f=$('tvup');f.onchange=()=>{const x=f.files[0];if(x){if(tiltOff){tiltOff();tiltOff=null;}upload(id,x);}};
   bindTilt();
@@ -1381,7 +1418,7 @@ function coverDraw(g,img,W,H){const s=Math.max(W/img.width,H/img.height),w=img.w
 function photoURL(img){const cv=document.createElement('canvas');cv.width=400;cv.height=560;coverDraw(cv.getContext('2d'),img,400,560);return cv.toDataURL('image/jpeg',.78);}
 function pixelFrom(sm){
   const W=sm.width,H=sm.height,g=sm.getContext('2d'),id=g.getImageData(0,0,W,H),d=id.data,BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=(y*W+x)*4;let r=d[i],gr=d[i+1],b=d[i+2];
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=(y*W+x)*4;if(d[i+3]<128){d[i+3]=0;continue;}let r=d[i],gr=d[i+1],b=d[i+2];
     const l=(r+gr+b)/3;r=l+(r-l)*1.25;gr=l+(gr-l)*1.25;b=l+(b-l)*1.25;
     r=(r-128)*1.12+128;gr=(gr-128)*1.12+128;b=(b-128)*1.12+128;
     const t=(BY[(y&3)*4+(x&3)]/16-.47)*22;r+=t;gr+=t;b+=t;
@@ -1394,20 +1431,21 @@ function pixelFrom(sm){
 let pend=null;
 async function upload(id,file,coverSec){
   if(!file)return;
-  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec};showPx();}catch(e){toast('No se pudo abrir esa foto');}
+  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec,alpha:hasAlpha(img)};showPx();}catch(e){toast('No se pudo abrir esa foto');}
 }
 /* dibuja la foto con el zoom y la posición elegidos */
 function drawSrc(W,H){
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
-  g.fillStyle='#17142b';g.fillRect(0,0,W,H);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
   const img=pend.img,sc=Math.max(W/img.width,H/img.height)*pend.z,w=img.width*sc,h=img.height*sc;
   g.drawImage(img,(W-w)/2+pend.px*W,(H-h)/2+pend.py*H,w,h);return cv;
 }
 function zMin(){const img=pend.img,r=pend.ratio,W=1,H=1/r;return Math.min(W/img.width,H/img.height)/Math.max(W/img.width,H/img.height);}
 function makeURL(){
   if(pxOn){const W=PXDET[pxDet];return pixelFrom(drawSrc(W,Math.max(1,Math.round(W/pend.ratio))));}
-  return drawSrc(400,Math.round(400/pend.ratio)).toDataURL('image/jpeg',.8);
+  const cv=drawSrc(400,Math.round(400/pend.ratio));return pend.alpha?cv.toDataURL('image/png'):cv.toDataURL('image/jpeg',.8);
 }
+function hasAlpha(img){const c=document.createElement('canvas');c.width=48;c.height=48;const g=c.getContext('2d');g.drawImage(img,0,0,48,48);const d=g.getImageData(0,0,48,48).data;for(let i=3;i<d.length;i+=4)if(d[i]<245)return true;return false;}
 let pxRaf=0;
 function redrawPx(){if(pxRaf)return;pxRaf=requestAnimationFrame(()=>{pxRaf=0;if(!pend)return;pend.url=makeURL();const el=$('ovin').querySelector('.zoom .art');if(el){el.style.backgroundImage=`url('${pend.url}')`;el.classList.remove('spr');}});}
 function showPx(){
@@ -1545,7 +1583,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='25';
+const APP_VERSION='26';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
