@@ -153,8 +153,9 @@ input[type=text],input[type=number],select{font-family:var(--body);font-size:22p
 .hint{font-family:var(--pix);font-size:9px;color:var(--mute);text-align:center;line-height:1.7;animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:.35}}
 .reveal{display:flex;flex-wrap:wrap;justify-content:center;gap:18px 14px;width:100%}
-@media (min-width:640px){.reveal .fc{width:calc((100% - 56px)/5)!important}}
-.fc{perspective:900px;border:0;padding:0;background:none;display:flex;flex-direction:column;gap:10px;align-items:center;width:calc((100% - 28px)/3);max-width:150px;animation:deal .35s cubic-bezier(.2,.8,.3,1) backwards}
+@media (min-width:640px){.reveal .fc{width:calc((100% - 72px)/5)!important;max-width:190px}}
+.ovin.wide{max-width:1000px}
+.fc{perspective:900px;border:0;padding:0;background:none;display:flex;flex-direction:column;gap:10px;align-items:center;width:calc((100% - 28px)/3);max-width:170px;animation:deal .35s cubic-bezier(.2,.8,.3,1) backwards}
 .fcin{width:100%;aspect-ratio:5/7;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,.7,.2,1);will-change:transform}
 .fc.on .fcin{transform:rotateY(180deg)}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
@@ -432,14 +433,14 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .boot{font-family:var(--pix);font-size:10px;color:var(--mute)}
 /* ===== Lámina: diseño de carta coleccionable ===== */
 .card{--f1:#d9dbe6;--f2:#6e7286;--f3:#3b3e4f;aspect-ratio:5/7;width:100%;max-width:100%;position:relative;container-type:inline-size;display:block;overflow:visible;
-  background:linear-gradient(145deg,var(--f1) 0%,var(--f2) 55%,var(--f3) 100%);padding:3.4cqw;
-  box-shadow:0 0 0 .8cqw #0b0812,4px 4px 0 2px #0009}
+  background:linear-gradient(145deg,var(--f1) 0%,var(--f2) 55%,var(--f3) 100%);padding:0;
+  box-shadow:0 0 0 2px #0b0812,4px 4px 0 2px #0009}
 .card.rR{--f1:#bfe0ff;--f2:#3f7fe0;--f3:#1c3a80}
 .card.rB{--f1:#fbd6ff;--f2:#b05ce0;--f3:#5a2386}
 .card.rL{--f1:#fff3b0;--f2:#e0a822;--f3:#7a5208}
 .card.rM{--f1:#ff9ad8;--f2:#9a7bff;--f3:#2bb3c0;background:linear-gradient(135deg,#ff5fd2,#ffd23f,#3fae6a,#4fb8ff,#b866e8,#ff5fd2);background-size:300% 300%;animation:rainbow 5s linear infinite}
 @keyframes rainbow{to{background-position:300% 0}}
-.card .cin{position:relative;height:100%;display:flex;flex-direction:column;overflow:hidden;
+.card .cin{position:absolute;inset:2.43% 3.4%;display:flex;flex-direction:column;overflow:hidden;
   background:radial-gradient(circle at 30% 18%,#ffffff2e,transparent 55%),repeating-linear-gradient(45deg,#ffffff0a 0 2cqw,transparent 2cqw 4cqw),linear-gradient(170deg,color-mix(in srgb,var(--pc) 85%,#fff),color-mix(in srgb,var(--pc) 55%,#000) 70%,color-mix(in srgb,var(--pc) 35%,#000));
   box-shadow:inset 0 0 0 .8cqw #00000055}
 .card .top{display:flex;align-items:center;gap:2cqw;padding:3.2cqw 3.2cqw 2.4cqw;background:none;font-family:var(--pix);color:#fff;text-shadow:.6cqw .6cqw 0 #0008}
@@ -463,8 +464,8 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
   background:radial-gradient(1.6cqw 1.6cqw at 14% 22%,#fff 40%,transparent 60%),radial-gradient(1.2cqw 1.2cqw at 86% 30%,#fff 40%,transparent 60%),radial-gradient(1.4cqw 1.4cqw at 78% 70%,#fff 40%,transparent 60%),radial-gradient(1cqw 1cqw at 20% 64%,#fff 40%,transparent 60%);
   animation:twinkle 1.8s steps(2) infinite}
 @keyframes twinkle{50%{opacity:.15}}
-.card.lg::after{inset:3.4cqw}
-.card.my{box-shadow:0 0 0 .8cqw #0b0812,4px 4px 0 2px #0009}
+.card.lg::after{inset:2.43% 3.4%}
+.card.my{box-shadow:0 0 0 2px #0b0812,4px 4px 0 2px #0009}
 .card.my .top{background:none}
 .card.my::before{display:none}
 .card.my .rar i{background:none}
@@ -1085,7 +1086,7 @@ function showPack(drawn,done){
   pk.onpointerup=e=>{if(sx!=null&&Math.abs(e.clientX-sx)<6&&prog<1){sfx.tear();setP(prog+.34);}sx=null;};
   function torn(){if(gone)return;gone=true;pk.onpointermove=pk.onpointerdown=pk.onpointerup=null;pk.classList.add('gone');if(navigator.vibrate)navigator.vibrate(30);setTimeout(reveal,420);}
   function reveal(){
-    inn.innerHTML=`<div class="ovtitle pix">TOCA CADA LÁMINA</div><div class="reveal">${drawn.map((d,i)=>`<button class="fc" data-i="${i}" style="animation-delay:${i*.08}s"><div class="fcin"><div class="face"><div class="back${d.c.r!=='C'?' g'+d.c.r:''}">?</div></div><div class="face front">${cardHTML(d.c)}</div></div><span class="tag ${d.isNew?'new':'dup'}">${d.isNew?'¡NUEVA!':'REPETIDA'}</span></button>`).join('')}</div>
+    inn.className='ovin wide';inn.innerHTML=`<div class="ovtitle pix">TOCA CADA LÁMINA</div><div class="reveal">${drawn.map((d,i)=>`<button class="fc" data-i="${i}" style="animation-delay:${i*.08}s"><div class="fcin"><div class="face"><div class="back${d.c.r!=='C'?' g'+d.c.r:''}">?</div></div><div class="face front">${cardHTML(d.c)}</div></div><span class="tag ${d.isNew?'new':'dup'}">${d.isNew?'¡NUEVA!':'REPETIDA'}</span></button>`).join('')}</div>
       <div class="row" id="pkdone" hidden></div>`;
     let left=drawn.length;
     inn.querySelectorAll('.fc').forEach(b=>b.onclick=()=>{if(b.classList.contains('on'))return;b.classList.add('on');const d=drawn[+b.dataset.i];
@@ -1100,7 +1101,7 @@ function showPack(drawn,done){
   }
 }
 function celebrate(done){if(done&&done.length){setTimeout(()=>{sfx.fan();Fx.fireworks(done.some(i=>SECTIONS[i].letters));Cats.party();(done.some(i=>SECTIONS[i].letters)?toast('♥ T E  A M O ♥  ¡Completaste la sección más importante!'):toast('¡SECCIÓN COMPLETA! '+done.map(i=>SECTIONS[i].t).join(' · ')));},250);}}
-function closeOv(){if(tiltOff){tiltOff();tiltOff=null;}const ov=$('ov');ov.hidden=true;ov.className='ov';$('ovin').innerHTML='';document.body.classList.remove('ov-open');if(dirty){dirty=false;render();}}
+function closeOv(){if(tiltOff){tiltOff();tiltOff=null;}const ov=$('ov');ov.hidden=true;ov.className='ov';$('ovin').innerHTML='';$('ovin').className='ovin';document.body.classList.remove('ov-open');if(dirty){dirty=false;render();}}
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov'&&!$('pk')&&!document.querySelector('.fc'))closeOv();});
 
 /* ===== Visor 3D de lámina ===== */
@@ -1361,7 +1362,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='22';
+const APP_VERSION='23';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
