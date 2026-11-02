@@ -596,6 +596,30 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .back.ph .bq{position:absolute;top:9%;right:10%;font-size:14px;background:#0a0818cc;padding:4px 5px;box-shadow:0 0 0 2px #f4c430}
 .bkmini.ph .bq{font-size:8px;padding:2px 3px}
 .bkprev .bq{position:absolute;top:9%;right:10%;font-size:20px;background:#0a0818cc;padding:6px 7px;box-shadow:0 0 0 2px #f4c430}
+
+/* pantalla de inicio con televisor */
+.thero{position:relative;width:100%;height:clamp(150px,42vw,200px)}
+.thero .tfan{position:absolute;inset:0;height:auto}
+.thero .tv{display:none}
+.thero.img{height:clamp(210px,60vw,270px)}
+.thero.img .tv{display:block;position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:min(70vw,280px);z-index:3;animation:bob 3.4s ease-in-out infinite}
+.tv{background:linear-gradient(180deg,#4a3f6e,#2b2444);border-radius:16px;padding:10px 10px 26px;box-shadow:0 0 0 3px #0b0812,inset 0 2px 0 #ffffff33,7px 7px 0 3px #0009}
+.tv::before{content:"";position:absolute;left:50%;top:-34px;width:70px;height:36px;transform:translateX(-50%);
+  background:linear-gradient(60deg,transparent 46%,#c9c3dc 46% 54%,transparent 54%) left/50% 100% no-repeat,linear-gradient(-60deg,transparent 46%,#c9c3dc 46% 54%,transparent 54%) right/50% 100% no-repeat}
+.tv::after{content:"";position:absolute;right:14px;bottom:7px;width:12px;height:12px;border-radius:50%;background:#f4c430;box-shadow:-20px 0 0 #e0483e,-40px 0 0 #3fae6a}
+.tvscr{position:relative;aspect-ratio:4/3;border-radius:12px/16px;background:#0c0a1a center/cover no-repeat;image-rendering:pixelated;overflow:hidden;box-shadow:inset 0 0 0 3px #0b0812,inset 0 0 22px #000c}
+.tvscr::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#ffffff10 0 1px,transparent 1px 3px),radial-gradient(ellipse at 30% 20%,#ffffff40,transparent 45%);pointer-events:none}
+.thero.img .tcard{width:clamp(78px,22vw,104px);margin-left:calc(clamp(78px,22vw,104px)/-2);top:28%;z-index:1}
+.thero.img .tcard.t1{display:none}
+.thero.img .tcard.t0{transform:translateX(-150%) rotate(-16deg)}
+.thero.img .tcard.t2{transform:translateX(150%) rotate(16deg)}
+.title.timg .tlogo{font-size:clamp(17px,5.6vw,23px)}
+.title.timg .tin{gap:14px}
+.tvmini{width:64px;height:48px;flex:none;border-radius:8px;background:#0c0a1a center/cover no-repeat;image-rendering:pixelated;box-shadow:0 0 0 3px #4a3f6e,0 0 0 5px #0b0812}
+.tvmini.empty{display:flex;align-items:center;justify-content:center;font-family:var(--pix);font-size:9px;color:var(--mute)}
+.tvprev{width:100%;background:linear-gradient(180deg,#4a3f6e,#2b2444);border-radius:16px;padding:10px 10px 26px;box-shadow:0 0 0 3px #0b0812}
+.tvprev .art{aspect-ratio:4/3;border-radius:12px/16px;background:#0c0a1a center/cover no-repeat;image-rendering:pixelated}
+.thero.img{margin-top:22px}
 </style>
 </head>
 <body>
@@ -614,7 +638,7 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
   <div class="tin">
     <div class="logo" aria-hidden="true"><i style="background:var(--red)"></i><i style="background:var(--yel)"></i><i style="background:var(--grn)"></i><i style="background:var(--blu)"></i></div>
     <h1 class="pix tlogo">NUESTRO<br>ÁLBUM<br>RETRO</h1>
-    <div class="tfan" id="tfan" aria-hidden="true"></div>
+    <div class="thero" id="thero"><div class="tfan" id="tfan" aria-hidden="true"></div><div class="tv" aria-hidden="true"><div class="tvscr" id="tvscr"></div></div></div>
     <div class="tstat" id="tstat">Cargando tu colección…</div>
     <button class="btn red tstart" id="tstart">PRESS START</button>
     <div class="tfoot">♥ Mati &amp; Marcelita ♥</div>
@@ -1408,6 +1432,9 @@ function vTaller(){
     <div class="prog" style="--pc:var(--grn);margin:8px 0 10px"><i style="width:${ok/CARDS.length*100}%"></i></div>
     ${miss.length?`<div class="lbl" style="color:var(--yel)">Faltan ${miss.length}:</div>${SECTIONS.map((x,i)=>{const m=miss.filter(c=>c.page===i);return m.length?`<div class="missec"><b style="color:${x.c}">${esc(x.t)}</b> · ${m.map(c=>`<button class="misbtn" data-tview="${c.id}">#${String(c.num).padStart(3,'0')} ${esc(cname(c))}</button>`).join('')}</div>`:'';}).join('')}`:'<div style="font-size:22px;color:var(--grn)">✔ ¡Todas las láminas tienen foto!</div>'}
     <div class="muted" style="margin-top:10px">${covs.length?`Portadas sin foto (${covs.length}): ${covs.map(i=>esc(SECTIONS[i].t)).join(', ')}. Son opcionales: sin portada se ven tus mejores láminas.`:'✔ Todas las secciones tienen portada.'}</div></div>`;})()}
+  <div class="box bkrow"><div class="tvmini${S.imgs['title~img']?'':' empty'}"${S.imgs['title~img']?` style="background-image:url('${S.imgs['title~img']}')"`:''}>${S.imgs['title~img']?'':'TV'}</div>
+    <div style="flex:1;min-width:0"><div class="lbl">Imagen de la pantalla de inicio</div><div class="muted">${S.imgs['title~img']?'Aparece en el televisor de la portada, con tus mejores láminas asomándose a los lados.':'Sube una imagen de ustedes para la portada de la app.'}</div></div>
+    <div class="row" style="flex-direction:column;align-items:stretch;gap:8px"><label class="btn sm" style="cursor:pointer">${S.imgs['title~img']?'CAMBIAR':'SUBIR'}<input type="file" accept="image/*" id="ttlup" hidden></label>${S.imgs['title~img']?'<button class="btn ghost sm" id="ttldel">QUITAR</button>':''}</div></div>
   <div class="box bkrow"><div class="bkmini back${backImg()?' ph':''}"${bkAttr()}><span class="bq">?</span></div>
     <div style="flex:1;min-width:0"><div class="lbl">Reverso de las láminas</div><div class="muted">${backImg()?'Con tu foto: se ve al abrir sobres, en el visor 3D y en el memorice.':'Diseño de cuadritos. Sube una foto de ustedes para personalizarlo.'}</div></div>
     <div class="row" style="flex-direction:column;align-items:stretch;gap:8px"><label class="btn sm" style="cursor:pointer">${backImg()?'CAMBIAR':'SUBIR FOTO'}<input type="file" accept="image/*" id="bkup" hidden></label>${backImg()?'<button class="btn ghost sm" id="bkdel">QUITAR</button>':''}</div></div>
@@ -1649,7 +1676,7 @@ function pixelFrom(sm){
 let pend=null;
 async function upload(id,file,coverSec){
   if(!file)return;
-  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,file,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec,back:id==='back~all',alpha:hasAlpha(img)};showPx();}catch(e){toast('No se pudo abrir esa foto');}
+  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,file,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec,back:id==='back~all',ttl:id==='title~img',alpha:hasAlpha(img)};showPx();}catch(e){toast('No se pudo abrir esa foto');}
 }
 /* dibuja la foto con el zoom y la posición elegidos */
 function drawSrc(W,H){
@@ -1682,9 +1709,9 @@ let pxRaf=0;
 function redrawPx(){if(pxRaf)return;pxRaf=requestAnimationFrame(()=>{pxRaf=0;if(!pend)return;pend.url=makeURL();const el=$('ovin').querySelector('.zoom .art');if(el){el.style.backgroundImage=`url('${pend.url}')`;el.classList.remove('spr');}});}
 function showPx(){
   if(!pend)return;const c=CBY[pend.id];
-  const prev=pend.back?`<div class="bkprev"><div class="art"></div><span class="bq">?</span><span class="bklogo">NUESTRO ÁLBUM RETRO</span></div>`:pend.cover?`<div class="cvprev" style="--pc:${SECTIONS[pend.sec].c}"><div class="art"></div><div class="cvt">${esc(SECTIONS[pend.sec].t)}</div></div>`:cardHTML(c,0,'data:image/gif;base64,R0lGODlhAQABAAAAACw=');
+  const prev=pend.ttl?`<div class="tvprev"><div class="art"></div></div>`:pend.back?`<div class="bkprev"><div class="art"></div><span class="bq">?</span><span class="bklogo">NUESTRO ÁLBUM RETRO</span></div>`:pend.cover?`<div class="cvprev" style="--pc:${SECTIONS[pend.sec].c}"><div class="art"></div><div class="cvt">${esc(SECTIONS[pend.sec].t)}</div></div>`:cardHTML(c,0,'data:image/gif;base64,R0lGODlhAQABAAAAACw=');
   $('ov').hidden=false;document.body.classList.add('ov-open');
-  $('ovin').innerHTML=`<div class="ovtitle pix">${pend.back?'AJUSTA EL REVERSO':pend.cover?'AJUSTA LA PORTADA':'AJUSTA TU FOTO'}</div>
+  $('ovin').innerHTML=`<div class="ovtitle pix">${pend.ttl?'AJUSTA LA PANTALLA DE INICIO':pend.back?'AJUSTA EL REVERSO':pend.cover?'AJUSTA LA PORTADA':'AJUSTA TU FOTO'}</div>
     <div class="zoom pxedit">${prev}</div>
     <div class="hint" style="animation:none">ARRASTRA PARA MOVER · PELLIZCA PARA ZOOM</div>
     <div class="box" style="width:100%;display:flex;flex-direction:column;gap:12px">
@@ -1719,7 +1746,7 @@ function showPx(){
   $('ovin').querySelectorAll('[data-pxd]').forEach(b=>b.onclick=()=>{pxDet=b.dataset.pxd;try{localStorage.setItem('alb_pxd',pxDet)}catch(e){}sfx.blip();showPx();});
   $('pxcancel').onclick=()=>{URL.revokeObjectURL(pend.img.src);pend=null;closeOv();};
   $('pxsave').onclick=async()=>{const b=$('pxsave');b.disabled=true;b.textContent='GUARDANDO…';const id=pend.id,url=makeURL();
-    try{await setDoc(doc(fs,'cardimg',id),{d:url});URL.revokeObjectURL(pend.img.src);pend=null;closeOv();sfx.ok();toast(id==='back~all'?'Reverso listo':id.startsWith('cover~')?'Portada lista':'Foto lista');}
+    try{await setDoc(doc(fs,'cardimg',id),{d:url});URL.revokeObjectURL(pend.img.src);pend=null;closeOv();sfx.ok();toast(id==='title~img'?'Pantalla de inicio lista':id==='back~all'?'Reverso listo':id.startsWith('cover~')?'Portada lista':'Foto lista');}
     catch(e){b.disabled=false;b.textContent='GUARDAR';toast('No se pudo guardar. Revisa tu conexión.');}};
   redrawPx();
 }
@@ -1738,6 +1765,8 @@ function bind(){
   const on=(id,fn)=>{const el=$(id);if(el)el.onclick=fn;};
   on('open',()=>{ac();sfx.blip();openPack();});on('daily',claimDaily);on('swap',swapDups);on('redeem',redeem);on('propose',propose);on('mkcode',mkCode);on('reset',doReset);
   on('logout',()=>{signOut(auth);});
+  {const tu=$('ttlup');if(tu)tu.onchange=()=>{const f=tu.files[0];tu.value='';upload('title~img',f);};}
+  on('ttldel',async()=>{try{await deleteDoc(doc(fs,'cardimg','title~img'));toast('La portada volvió a las cartas');}catch(e){toast('No se pudo quitar');}});
   {const bu=$('bkup');if(bu)bu.onchange=()=>{const f=bu.files[0];bu.value='';upload('back~all',f);};}
   on('bkdel',async()=>{try{await deleteDoc(doc(fs,'cardimg','back~all'));toast('Volvió el reverso de cuadritos');}catch(e){toast('No se pudo quitar');}});
   on('spopen',()=>{ac();sfx.blip();openSpecial();});
@@ -1777,6 +1806,7 @@ function renderTitle(){
   if($('title').hidden)return;
   const mine=CARDS.filter(c=>cnt(me,c.id)>0),order={M:0,L:1,B:2,R:3,C:4};
   const best=mine.sort((a,b)=>order[a.r]-order[b.r]).slice(0,3);
+  const ti=S.imgs&&S.imgs['title~img'];$('thero').classList.toggle('img',!!ti);$('title').classList.toggle('timg',!!ti);if(ti){const sc=$('tvscr');const v=`url("${ti}")`;if(sc.style.backgroundImage!==v)sc.style.backgroundImage=v;}
   $('tfan').innerHTML=[0,1,2].map(i=>`<div class="tcard t${i}">${best[i]?cardHTML(best[i]):'<div class="back">?</div>'}</div>`).join('');
   if(!S.ready){$('tstat').textContent='Cargando tu colección…';return;}
   const daily=P(me).lastDaily!==today();
@@ -1880,7 +1910,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='37';
+const APP_VERSION='38';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
