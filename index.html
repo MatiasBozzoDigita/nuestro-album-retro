@@ -574,6 +574,28 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .giftb.open .gbox{animation:popc .6s ease-out forwards}
 .ov.wel{background:#06040ef7}
 .missec{font-size:19px;margin-top:6px;line-height:1.3}.misbtn{border:0;background:var(--deep);color:var(--ink);font-family:var(--body);font-size:18px;padding:2px 8px;margin:3px 4px 0 0;box-shadow:0 0 0 2px var(--line2);cursor:pointer}
+
+/* reverso con foto */
+.back{position:relative}
+.back .bq{position:relative;z-index:2;font-family:var(--pix);font-size:28px;color:var(--yel);text-shadow:3px 3px 0 #000}
+.back.ph{background:linear-gradient(#0a081870,#0a0818a0),var(--bk) center/cover no-repeat;image-rendering:pixelated}
+.back.ph::before{content:"";position:absolute;inset:6%;border:3px solid #f4c430d0;box-shadow:0 0 0 2px #0a0818aa,inset 0 0 0 2px #0a0818aa;pointer-events:none;z-index:1}
+.back.ph::after{content:"NUESTRO ÁLBUM RETRO";position:absolute;left:0;right:0;bottom:9%;font-family:var(--pix);font-size:6px;letter-spacing:.06em;color:#fff;text-align:center;text-shadow:1px 1px 0 #000;z-index:2}
+.back.tbk.ph::after{display:none}
+.back.tbk.ph span,.back.tbk.ph small{position:relative;z-index:2;text-shadow:2px 2px 0 #000}
+.mt .mb.ph{background:linear-gradient(#0a081860,#0a081860),var(--bk) center/cover no-repeat;image-rendering:pixelated;box-shadow:0 0 0 2px #f4c430}
+.bkrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bkmini{width:64px;height:90px;flex:none;display:flex;align-items:center;justify-content:center}
+.bkmini .bq{font-size:16px}.bkmini.ph::after{font-size:3px}
+.bkprev{position:relative;aspect-ratio:5/7;width:100%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff3,4px 4px 0 3px #0009}
+.bkprev .art{position:absolute;inset:0;background:#0c0a1a center/cover no-repeat;image-rendering:pixelated}
+.bkprev::before{content:"";position:absolute;inset:0;background:linear-gradient(#0a081870,#0a0818a0);pointer-events:none;z-index:1}
+.bkprev::after{content:"";position:absolute;inset:6%;border:3px solid #f4c430d0;pointer-events:none;z-index:1}
+.bkprev .bq{position:relative;z-index:2;font-family:var(--pix);font-size:44px;color:var(--yel);text-shadow:3px 3px 0 #000;pointer-events:none}
+.bkprev .bklogo{position:absolute;left:0;right:0;bottom:9%;z-index:2;font-family:var(--pix);font-size:9px;color:#fff;text-align:center;text-shadow:1px 1px 0 #000;pointer-events:none}
+.back.ph .bq{position:absolute;top:9%;right:10%;font-size:14px;background:#0a0818cc;padding:4px 5px;box-shadow:0 0 0 2px #f4c430}
+.bkmini.ph .bq{font-size:8px;padding:2px 3px}
+.bkprev .bq{position:absolute;top:9%;right:10%;font-size:20px;background:#0a0818cc;padding:6px 7px;box-shadow:0 0 0 2px #f4c430}
 </style>
 </head>
 <body>
@@ -1074,7 +1096,7 @@ function playMemo(d){
   const deck=shuf([...pool,...pool]);let open=[],found=0,lock=false;const t0=performance.now();
   ovShow(`<div class="ovtitle pix">PARES <span id="mf">0</span>/8 · <span id="mt">0.0</span> s</div>
     <div class="mprog"><span>${esc(nm(rival(d)))}</span><div class="prog" style="--pc:#ff7ab0"><i id="oprog" style="width:0%"></i></div></div>
-    <div class="memo" id="memo">${deck.map((c,i)=>{const im=S.imgs[c.id];return `<button class="mt" data-i="${i}"><i class="mb"></i><i class="mf ${im?'':'spr'}" style="background-image:url('${im||sprite(c)}')"></i></button>`;}).join('')}</div>
+    <div class="memo" id="memo">${deck.map((c,i)=>{const im=S.imgs[c.id];return `<button class="mt" data-i="${i}"><i class="mb${backImg()?' ph':''}"${bkAttr()}></i><i class="mf ${im?'':'spr'}" style="background-image:url('${im||sprite(c)}')"></i></button>`;}).join('')}</div>
     <button class="btn ghost sm" id="mgive">RENDIRSE</button>`);
   const clock=setInterval(()=>{if(!G||G.phase!=='play'){clearInterval(clock);return;}$('mt').textContent=((performance.now()-t0)/1000).toFixed(1);
     const op=$('oprog'),cur=S.duel;if(op&&cur)op.style.width=Math.min(100,((cur.prog&&cur.prog[rival(d)])||0)/8*100)+'%';},100);
@@ -1099,6 +1121,8 @@ function sprite(c){
 
 /* ===== Lámina ===== */
 function nmSize(n){const w=Math.max(...n.split(/\s+/).map(x=>x.length));return (n.length>26||w>12)?' xl':(n.length>16||w>9)?' lg2':n.length<=6?' sm2':'';}
+const backImg=()=>S.imgs['back~all']||'';
+const bkAttr=()=>backImg()?` style="--bk:url('${backImg()}')"`:'';
 function cardHTML(c,count=0,ovImg){
   const img=ovImg||cimg(c),hol=c.r==='B'||c.r==='L'||c.r==='M',sx=SECTIONS[c.page];
   return `<div class="card r${c.r}${hol?' holo':''}${c.r==='L'||c.r==='M'?' lg':''}${c.r==='M'?' my':''}" style="--pc:${sx.c};--rc:var(--c-${c.r})">
@@ -1384,6 +1408,9 @@ function vTaller(){
     <div class="prog" style="--pc:var(--grn);margin:8px 0 10px"><i style="width:${ok/CARDS.length*100}%"></i></div>
     ${miss.length?`<div class="lbl" style="color:var(--yel)">Faltan ${miss.length}:</div>${SECTIONS.map((x,i)=>{const m=miss.filter(c=>c.page===i);return m.length?`<div class="missec"><b style="color:${x.c}">${esc(x.t)}</b> · ${m.map(c=>`<button class="misbtn" data-tview="${c.id}">#${String(c.num).padStart(3,'0')} ${esc(cname(c))}</button>`).join('')}</div>`:'';}).join('')}`:'<div style="font-size:22px;color:var(--grn)">✔ ¡Todas las láminas tienen foto!</div>'}
     <div class="muted" style="margin-top:10px">${covs.length?`Portadas sin foto (${covs.length}): ${covs.map(i=>esc(SECTIONS[i].t)).join(', ')}. Son opcionales: sin portada se ven tus mejores láminas.`:'✔ Todas las secciones tienen portada.'}</div></div>`;})()}
+  <div class="box bkrow"><div class="bkmini back${backImg()?' ph':''}"${bkAttr()}><span class="bq">?</span></div>
+    <div style="flex:1;min-width:0"><div class="lbl">Reverso de las láminas</div><div class="muted">${backImg()?'Con tu foto: se ve al abrir sobres, en el visor 3D y en el memorice.':'Diseño de cuadritos. Sube una foto de ustedes para personalizarlo.'}</div></div>
+    <div class="row" style="flex-direction:column;align-items:stretch;gap:8px"><label class="btn sm" style="cursor:pointer">${backImg()?'CAMBIAR':'SUBIR FOTO'}<input type="file" accept="image/*" id="bkup" hidden></label>${backImg()?'<button class="btn ghost sm" id="bkdel">QUITAR</button>':''}</div></div>
   <div class="box"><div class="lbl">Jugar como (para probar)</div><div class="row" style="margin-top:10px">
     ${WHO.map(w=>`<button class="btn ${me===w?'':'ghost'} sm" data-as="${w}">${esc(nm(w).toUpperCase())}</button>`).join('')}</div></div>
   <div class="box"><div class="lbl">Nombres que se muestran</div><div class="row" style="margin-top:10px">
@@ -1452,7 +1479,7 @@ function showPack(drawn,done,sp){
   pk.onpointerup=e=>{if(sx!=null&&Math.abs(e.clientX-sx)<6&&prog<1){sfx.tear();setP(prog+.34);}sx=null;};
   function torn(){if(gone)return;gone=true;pk.onpointermove=pk.onpointerdown=pk.onpointerup=null;pk.classList.add('gone');if(navigator.vibrate)navigator.vibrate(30);setTimeout(reveal,420);}
   function reveal(){
-    inn.className='ovin wide';inn.innerHTML=`<div class="ovtitle pix">TOCA CADA LÁMINA</div><div class="reveal">${drawn.map((d,i)=>`<button class="fc" data-i="${i}" style="animation-delay:${i*.08}s"><div class="fcin"><div class="face"><div class="back${d.c.r!=='C'?' g'+d.c.r:''}">?</div></div><div class="face front">${cardHTML(d.c)}</div></div><span class="tag ${d.isNew?'new':'dup'}">${d.isNew?'¡NUEVA!':'REPETIDA'}</span></button>`).join('')}</div>
+    inn.className='ovin wide';inn.innerHTML=`<div class="ovtitle pix">TOCA CADA LÁMINA</div><div class="reveal">${drawn.map((d,i)=>`<button class="fc" data-i="${i}" style="animation-delay:${i*.08}s"><div class="fcin"><div class="face"><div class="back${d.c.r!=='C'?' g'+d.c.r:''}${backImg()?' ph':''}"${bkAttr()}><span class="bq">?</span></div></div><div class="face front">${cardHTML(d.c)}</div></div><span class="tag ${d.isNew?'new':'dup'}">${d.isNew?'¡NUEVA!':'REPETIDA'}</span></button>`).join('')}</div>
       <div class="row" id="pkdone" hidden></div>`;
     let left=drawn.length;
     inn.querySelectorAll('.fc').forEach(b=>b.onclick=()=>{if(b.classList.contains('on'))return;b.classList.add('on');const d=drawn[+b.dataset.i];
@@ -1474,7 +1501,7 @@ $('ov').addEventListener('click',e=>{if(e.target.id==='ov'&&!$('pk')&&!document.
 let tiltOff=null;
 function tiltHTML(c,n=0){return `<div class="tilt" id="tilt"><div class="t3d" id="t3d">
   <div class="tface">${cardHTML(c,n)}<div class="glare" id="glare"></div></div>
-  <div class="tface tback"><div class="back tbk"><span class="logo"><i style="background:var(--red)"></i><i style="background:var(--yel)"></i><i style="background:var(--grn)"></i><i style="background:var(--blu)"></i></span><span>NUESTRO<br>ÁLBUM<br>RETRO</span><small>#${String(c.num).padStart(3,'0')}</small></div></div>
+  <div class="tface tback"><div class="back tbk${backImg()?' ph':''}"${bkAttr()}><span class="logo"><i style="background:var(--red)"></i><i style="background:var(--yel)"></i><i style="background:var(--grn)"></i><i style="background:var(--blu)"></i></span><span>NUESTRO<br>ÁLBUM<br>RETRO</span><small>#${String(c.num).padStart(3,'0')}</small></div></div>
   </div></div><div class="hint" style="animation:none">ARRASTRA PARA GIRARLA</div>`;}
 function bindTilt(){
   const w=$('tilt'),t=$('t3d'),gl=$('glare');if(!w)return;
@@ -1622,7 +1649,7 @@ function pixelFrom(sm){
 let pend=null;
 async function upload(id,file,coverSec){
   if(!file)return;
-  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,file,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec,alpha:hasAlpha(img)};showPx();}catch(e){toast('No se pudo abrir esa foto');}
+  try{const img=await loadImg(file);if(pend&&pend.img)URL.revokeObjectURL(pend.img.src);pend={id,img,file,z:1,px:0,py:0,ratio:5/7,cover:coverSec!=null,sec:coverSec,back:id==='back~all',alpha:hasAlpha(img)};showPx();}catch(e){toast('No se pudo abrir esa foto');}
 }
 /* dibuja la foto con el zoom y la posición elegidos */
 function drawSrc(W,H){
@@ -1655,9 +1682,9 @@ let pxRaf=0;
 function redrawPx(){if(pxRaf)return;pxRaf=requestAnimationFrame(()=>{pxRaf=0;if(!pend)return;pend.url=makeURL();const el=$('ovin').querySelector('.zoom .art');if(el){el.style.backgroundImage=`url('${pend.url}')`;el.classList.remove('spr');}});}
 function showPx(){
   if(!pend)return;const c=CBY[pend.id];
-  const prev=pend.cover?`<div class="cvprev" style="--pc:${SECTIONS[pend.sec].c}"><div class="art"></div><div class="cvt">${esc(SECTIONS[pend.sec].t)}</div></div>`:cardHTML(c,0,'data:image/gif;base64,R0lGODlhAQABAAAAACw=');
+  const prev=pend.back?`<div class="bkprev"><div class="art"></div><span class="bq">?</span><span class="bklogo">NUESTRO ÁLBUM RETRO</span></div>`:pend.cover?`<div class="cvprev" style="--pc:${SECTIONS[pend.sec].c}"><div class="art"></div><div class="cvt">${esc(SECTIONS[pend.sec].t)}</div></div>`:cardHTML(c,0,'data:image/gif;base64,R0lGODlhAQABAAAAACw=');
   $('ov').hidden=false;document.body.classList.add('ov-open');
-  $('ovin').innerHTML=`<div class="ovtitle pix">${pend.cover?'AJUSTA LA PORTADA':'AJUSTA TU FOTO'}</div>
+  $('ovin').innerHTML=`<div class="ovtitle pix">${pend.back?'AJUSTA EL REVERSO':pend.cover?'AJUSTA LA PORTADA':'AJUSTA TU FOTO'}</div>
     <div class="zoom pxedit">${prev}</div>
     <div class="hint" style="animation:none">ARRASTRA PARA MOVER · PELLIZCA PARA ZOOM</div>
     <div class="box" style="width:100%;display:flex;flex-direction:column;gap:12px">
@@ -1692,7 +1719,7 @@ function showPx(){
   $('ovin').querySelectorAll('[data-pxd]').forEach(b=>b.onclick=()=>{pxDet=b.dataset.pxd;try{localStorage.setItem('alb_pxd',pxDet)}catch(e){}sfx.blip();showPx();});
   $('pxcancel').onclick=()=>{URL.revokeObjectURL(pend.img.src);pend=null;closeOv();};
   $('pxsave').onclick=async()=>{const b=$('pxsave');b.disabled=true;b.textContent='GUARDANDO…';const id=pend.id,url=makeURL();
-    try{await setDoc(doc(fs,'cardimg',id),{d:url});URL.revokeObjectURL(pend.img.src);pend=null;closeOv();sfx.ok();toast(id.startsWith('cover~')?'Portada lista':'Foto lista');}
+    try{await setDoc(doc(fs,'cardimg',id),{d:url});URL.revokeObjectURL(pend.img.src);pend=null;closeOv();sfx.ok();toast(id==='back~all'?'Reverso listo':id.startsWith('cover~')?'Portada lista':'Foto lista');}
     catch(e){b.disabled=false;b.textContent='GUARDAR';toast('No se pudo guardar. Revisa tu conexión.');}};
   redrawPx();
 }
@@ -1711,6 +1738,8 @@ function bind(){
   const on=(id,fn)=>{const el=$(id);if(el)el.onclick=fn;};
   on('open',()=>{ac();sfx.blip();openPack();});on('daily',claimDaily);on('swap',swapDups);on('redeem',redeem);on('propose',propose);on('mkcode',mkCode);on('reset',doReset);
   on('logout',()=>{signOut(auth);});
+  {const bu=$('bkup');if(bu)bu.onchange=()=>{const f=bu.files[0];bu.value='';upload('back~all',f);};}
+  on('bkdel',async()=>{try{await deleteDoc(doc(fs,'cardimg','back~all'));toast('Volvió el reverso de cuadritos');}catch(e){toast('No se pudo quitar');}});
   on('spopen',()=>{ac();sfx.blip();openSpecial();});
   m.querySelectorAll('[data-mdo]').forEach(b=>b.onclick=()=>{sfx.ok();misSet(b.dataset.mdo,{st:'pend',by:me,at:Date.now()});});
   m.querySelectorAll('[data-mok]').forEach(b=>b.onclick=()=>{misSet(b.dataset.mok,{st:'done',ok:me,at:Date.now()});});
@@ -1851,7 +1880,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='36';
+const APP_VERSION='37';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
