@@ -652,7 +652,7 @@ const SECTIONS=[
    ...R_('C','Goomba','Koopa Troopa','Shy Guy','Lakitu','Bill Bala','Chomp Cadenas','Planta Piraña','Thwomp','Hermano Martillo','Kamek','Toadette','Birdo','Huesitos','Blooper','Champiñón','Champiñón 1-Up','Hoja Tanuki','Pluma de capa','Moneda','Tubería verde','Caparazón azul')]},
  {t:'Clásicos de Nintendo',who:'De Mati',c:'#f08a24',k:[...R_('L','Donkey Kong','Pikachu'),...R_('B','Bola Smash','Kirby','Samus Aran','Fox McCloud'),
    ...R_('R','Captain Falcon','Ness','Diddy Kong','Rey Dedede','Meta Knight','Ice Climbers','Pit','Mewtwo','Pokébola'),
-   ...R_('C','Falco','Peppy Hare','Arwing','Metroid','Ridley','King K. Rool','Cranky Kong','Waddle Dee','Jigglypuff','Charmander','Bulbasaur','Squirtle','Olimar y Pikmin','Aldeano','Tom Nook','Inkling','Marth','Ike','R.O.B.','Mr. Game & Watch','Duck Hunt','Little Mac','Excitebike')]},
+   ...R_('C','Falco','Peppy Hare','Arwing','Ridley','King K. Rool','Cranky Kong','Waddle Dee','Jigglypuff','Charmander','Bulbasaur','Squirtle','Olimar y Pikmin','Aldeano','Tom Nook','Inkling','Marth','Ike','R.O.B.','Mr. Game & Watch','Duck Hunt','Little Mac','Excitebike')]},
  {t:'Consolas y cartuchos',who:'De Mati',c:'#4377e0',k:[...R_('L','Nintendo 64','Super Nintendo'),...R_('B','NES','GameCube','Game Boy','Nintendo Switch'),
    ...R_('R','Wii','Game Boy Color','Game Boy Advance','Nintendo DS','Nintendo 3DS','Virtual Boy','Wii U','Game & Watch'),
    ...R_('C','Control de NES','Control de SNES','Control de N64','Control de GameCube','Wiimote','Joy-Con','Pro Controller','Ocarina of Time','Super Mario 64','Mario Kart 64','Super Mario World','Donkey Kong Country','Pokémon Rojo','Smash Bros. Melee','GoldenEye 007','A Link to the Past','Super Metroid','Star Fox 64','Breath of the Wild')]},
@@ -661,7 +661,7 @@ const SECTIONS=[
  {t:'Comida',who:'De los dos',c:'#d9a521',k:[...R_('L','Completos'),...R_('B','Pizza','Frutillas con chocolate'),...R_('R','Hamburguesas','Tacos','Empanadas','Chocolate'),
    ...R_('C','Papas fritas','Fajitas','Fideos','Lasaña','Carne asada','Cazuela de vacuno','Helados','Churros','Sopaipillas','Mote con huesillo','Pie de limón','Gomitas')]},
  {t:'Bandas y artistas',who:'De los dos',c:'#e0507a',k:[...R_('L','Pearl Jam','Ricardo Arjona'),...R_('B',"Guns N' Roses",'Metallica'),...R_('R','Linkin Park','Los Bunkers','Bad Bunny'),
-   ...R_('C','Limp Bizkit','Chico Trujillo','Entremares','Amar Azul','Dread Mar I','Luis Miguel','Luis Fonsi','Cristian Castro','Mon Laferte')]},
+   ...R_('C','Limp Bizkit','Chico Trujillo','Entremares','Amar Azul','Dread Mar I','Luis Miguel','Luis Fonsi','Cristian Castro','Mon Laferte','Bon Jovi')]},
  {t:'Fechas importantes',who:'De los dos',c:'#ff5fd2',k:R_('M','Cumpleaños de Mati','Cumpleaños de Marcelita','Nuestro aniversario')},
  {t:'Festividades',who:'De los dos',c:'#2bb3c0',k:[...R_('L','Fiestas Patrias'),...R_('B','Navidad'),...R_('R','San Valentín','Halloween'),
    ...R_('C','Año Nuevo','Pascua de Resurrección','Carnaval','Cumpleaños','Día de los Muertos')]},
@@ -1851,7 +1851,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='35';
+const APP_VERSION='36';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
