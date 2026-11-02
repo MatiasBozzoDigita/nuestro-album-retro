@@ -540,6 +540,17 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .spic{font-size:26px}.spic.big{font-size:44px}
 .pack.spk{background:linear-gradient(135deg,#ff5fd2 0 25%,#ffd23f 25% 50%,#ff4f7b 50% 75%,#b866e8 75%);box-shadow:0 0 0 4px #fff,0 0 30px 8px #ff5fd288,8px 8px 0 4px #000a}
 .pack.spk .body{gap:8px}.pack.spk .spt{font-size:20px;color:#ffd0e8;line-height:1}
+
+/* medallas */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;margin-top:12px}
+.medal{background:var(--deep);box-shadow:0 0 0 2px var(--line2);padding:10px 8px;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:stretch;filter:grayscale(.85);opacity:.7}
+.medal.on{filter:none;opacity:1;box-shadow:0 0 0 2px var(--yel),0 0 12px 1px #f4c43044;background:linear-gradient(180deg,#3a2f0c,var(--deep))}
+.medal .mic{font-size:30px;line-height:1.1}
+.medal .mn{font-family:var(--pix);font-size:7.5px;line-height:1.5;color:var(--ink)}
+.medal.on .mn{color:var(--yel)}
+.medal .md{font-size:15px;line-height:1;color:var(--mute)}
+.medal .prog{height:8px;margin-top:4px}
+.medal .mv{font-family:var(--pix);font-size:7px;color:var(--mute)}
 </style>
 </head>
 <body>
@@ -1137,7 +1148,7 @@ function render(){hdr();navR();BG.tint(tab==='album'&&sec>=0?SECTIONS[sec].c:(TA
 }
 let mainHtml='',animUntil=0,lateT=0;
 let dirty=false;
-function safeRender(){renderTitle();if(!$('ov').hidden){dirty=true;hdr();return;}const a=document.activeElement;if(tab==='taller'&&a&&a.tagName==='INPUT'&&a.type!=='file'){hdr();navR();return;}render();}
+function safeRender(){dailyTick();checkAch();renderTitle();if(!$('ov').hidden){dirty=true;hdr();return;}const a=document.activeElement;if(tab==='taller'&&a&&a.tagName==='INPUT'&&a.type!=='file'){hdr();navR();return;}render();}
 
 /* ===== Vista: Álbum ===== */
 function vAlbum(){return sec<0?vIndex():vSection();}
@@ -1264,6 +1275,63 @@ function vCambios(){
 }
 
 /* ===== Vista: Marcador ===== */
+/* ===== Logros y medallas ===== */
+const secIdx=t=>SECTIONS.findIndex(x=>x.t===t);
+const cntR=(w,r)=>BYR[r].filter(c=>cnt(w,c.id)).length;
+const secsDone=w=>SECTIONS.filter((_,i)=>secFull(w,i)).length;
+const ACH=[
+ ['sobre1','📦','Primer sobre','Abre tu primer sobre',w=>P(w).opened||0,1],
+ ['sobres50','🎁','Adicto a los sobres','Abre 50 sobres',w=>P(w).opened||0,50],
+ ['col25','🗂️','Coleccionista','Consigue 25 láminas distintas',w=>uniq(w),25],
+ ['col100','📒','Un tercio del álbum','Consigue 100 láminas distintas',w=>uniq(w),100],
+ ['col200','📚','Casi lleno','Consigue 200 láminas distintas',w=>uniq(w),200],
+ ['col300','🏆','Álbum completo','Consigue las 300 láminas',w=>uniq(w),300],
+ ['rara1','🔷','Algo raro','Consigue tu primera rara',w=>cntR(w,'R'),1],
+ ['bril1','✨','¡Brilla!','Consigue tu primera brillante',w=>cntR(w,'B'),1],
+ ['lege1','🌟','Leyenda','Consigue tu primera legendaria',w=>cntR(w,'L'),1],
+ ['lege10','👑','Realeza','Consigue 10 legendarias',w=>cntR(w,'L'),10],
+ ['miti1','💎','Mítico','Consigue tu primera mítica',w=>cntR(w,'M'),1],
+ ['miti3','🌈','Nuestras fechas','Consigue las 3 míticas',w=>cntR(w,'M'),3],
+ ['sec1','📗','Primera sección','Completa una sección',w=>secsDone(w),1],
+ ['sec5','🗃️','Ordenadito','Completa 5 secciones',w=>secsDone(w),5],
+ ['zelda','🗡️','Héroe del tiempo','Completa The Legend of Zelda',w=>pageDone(w,secIdx('The Legend of Zelda')),SC(secIdx('The Legend of Zelda')).length],
+ ['gatos','🐾','Familia felina','Completa la sección Gatos',w=>pageDone(w,secIdx('Gatos')),SC(secIdx('Gatos')).length],
+ ['teamo','❤️','Te amo','Completa la sección Te amo',w=>pageDone(w,secIdx('Te amo')),SC(secIdx('Te amo')).length],
+ ['trade1','🤝','Trato hecho','Haz tu primer intercambio',w=>P(w).trades||0,1],
+ ['trade10','🔁','Comerciante','Haz 10 intercambios',w=>P(w).trades||0,10],
+ ['duel1','⚔️','Primera victoria','Gana un duelo',w=>P(w).duelWins||0,1],
+ ['duel10','🥇','Campeón','Gana 10 duelos',w=>P(w).duelWins||0,10],
+ ['mis1','💌','Misión cumplida','Cumple una misión de pareja',w=>P(w).misDone||0,1],
+ ['mis20','💞','Equipo perfecto','Cumple 20 misiones de pareja',w=>P(w).misDone||0,20],
+ ['esp1','🎉','Día especial','Abre un sobre especial',w=>Object.keys(P(w).sp||{}).length,1],
+ ['racha7','🔥','Una semana juntos','Entra 7 días seguidos',w=>Math.max(P(w).streak||0,P(w).bestStreak||0),7],
+ ['racha30','☄️','Un mes sin fallar','Entra 30 días seguidos',w=>Math.max(P(w).streak||0,P(w).bestStreak||0),30],
+];
+const achGot=w=>Object.keys(P(w).ach||{}).length;
+let achBusy=false,tickDay='';
+function dailyTick(){
+  if(!S.ready||me!==realMe||tickDay===today())return;const pl=P(me);if(pl.lastSeen===today()){tickDay=today();return;}
+  tickDay=today();const y=new Date(Date.now()-864e5).toLocaleDateString('en-CA'),st=pl.lastSeen===y?(pl.streak||0)+1:1;
+  patchPlayer(me,{lastSeen:today(),streak:st,bestStreak:Math.max(st,pl.bestStreak||0)});
+}
+function checkAch(){
+  if(!S.ready||me!==realMe||achBusy)return;const have=P(me).ach||{};
+  const nw=ACH.filter(a=>!have[a[0]]&&a[4](me)>=a[5]);if(!nw.length)return;
+  achBusy=true;const upd={};nw.forEach(a=>upd[a[0]]=Date.now());
+  let coins=(P(me).coins||0)+nw.length,packs=P(me).packs||0,extra=0;while(coins>=5){coins-=5;packs++;extra++;}
+  patchPlayer(me,{ach:upd,coins,packs}).then(()=>{achBusy=false;});
+  setTimeout(()=>{sfx.fan();Cats.party();
+    toast(nw.length===1?`🏅 ¡Medalla nueva! ${nw[0][1]} ${nw[0][2]} · +1 moneda${extra?' · ¡+1 sobre!':''}`:`🏅 ¡${nw.length} medallas nuevas! +${nw.length} monedas${extra?` · ¡+${extra} sobre${extra>1?'s':''}!`:''}`);},600);
+}
+function medalsHTML(){
+  const have=P(me).ach||{},o=other();
+  return `<div class="box medals"><div class="row" style="align-items:flex-end"><div style="flex:1"><div class="lbl">Vitrina de medallas</div><div class="big">${achGot(me)}<span class="muted" style="font-size:20px">/${ACH.length}</span></div></div>
+    <div class="muted" style="text-align:right">${esc(nm(o))}: ${achGot(o)} medalla${achGot(o)===1?'':'s'}</div></div>
+    <div class="mgrid">${ACH.map(a=>{const ok=!!have[a[0]],v=Math.min(a[4](me),a[5]);return `<div class="medal${ok?' on':''}" title="${esc(a[3])}">
+      <div class="mic">${ok?a[1]:'🔒'}</div><div class="mn">${esc(a[2])}</div><div class="md">${esc(a[3])}</div>
+      ${ok?'':`<div class="prog" style="--pc:var(--yel)"><i style="width:${v/a[5]*100}%"></i></div><div class="mv">${v}/${a[5]}</div>`}</div>`;}).join('')}</div>
+    <div class="muted" style="font-size:17px;margin-top:10px;text-align:center">Cada medalla nueva: +1 moneda (5 monedas = 1 sobre)</div></div>`;
+}
 function vMarcador(){
   const st=w=>{const u=uniq(w),lg=BYR.L.filter(c=>cnt(w,c.id)).length,my=BYR.M.filter(c=>cnt(w,c.id)).length,secs=SECTIONS.filter((_,i)=>secFull(w,i)).length;
     return {w,u,lg,my,secs,pts:u*100+lg*400+my*1000+secs*2000};};
@@ -1279,7 +1347,7 @@ function vMarcador(){
        <div class="prog" style="--pc:${pc('matias')}"><i style="width:${pageDone('matias',i)/SC(i).length*100}%"></i></div><div class="v">${esc(nm('matias').slice(0,3).toUpperCase())} ${pageDone('matias',i)}</div>
        <div class="prog" style="--pc:${pc('polola')}"><i style="width:${pageDone('polola',i)/SC(i).length*100}%"></i></div><div class="v">${esc(nm('polola').slice(0,3).toUpperCase())} ${pageDone('polola',i)}</div></div>`).join('')}
     <div class="insert">PUNTOS: lámina 100 · legendaria 400 · mítica 1000 · sección 2000</div>
-  </div></div>`;
+  </div>${medalsHTML()}</div>`;
 }
 
 /* ===== Vista: Taller (solo Mati) ===== */
@@ -1696,7 +1764,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='32';
+const APP_VERSION='33';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
