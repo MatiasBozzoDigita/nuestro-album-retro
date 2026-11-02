@@ -525,6 +525,7 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
   box-shadow:inset 0 0 0 .8cqw #ffffffcc,inset 0 1.6cqw 0 #ffffff66}
 .card.rM .nm span{color:#fff;text-shadow:.6cqw .6cqw 0 #000,-.3cqw -.3cqw 0 #0008}
 .ov-open main .card .nm::after{animation-play-state:paused}
+.card .nm.sm2 span{font-size:15cqw}
 </style>
 </head>
 <body>
@@ -1016,7 +1017,7 @@ function sprite(c){
 }
 
 /* ===== Lámina ===== */
-function nmSize(n){const w=Math.max(...n.split(/\s+/).map(x=>x.length));return (n.length>26||w>12)?' xl':(n.length>16||w>9)?' lg2':'';}
+function nmSize(n){const w=Math.max(...n.split(/\s+/).map(x=>x.length));return (n.length>26||w>12)?' xl':(n.length>16||w>9)?' lg2':n.length<=6?' sm2':'';}
 function cardHTML(c,count=0,ovImg){
   const img=ovImg||cimg(c),hol=c.r==='B'||c.r==='L'||c.r==='M',sx=SECTIONS[c.page];
   return `<div class="card r${c.r}${hol?' holo':''}${c.r==='L'||c.r==='M'?' lg':''}${c.r==='M'?' my':''}" style="--pc:${sx.c};--rc:var(--c-${c.r})">
@@ -1623,7 +1624,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='30';
+const APP_VERSION='31';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
