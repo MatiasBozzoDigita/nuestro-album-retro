@@ -573,6 +573,7 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .giftb .rays{opacity:1;animation:spin 6s linear infinite;width:220px;height:220px;margin:-110px 0 0 -110px}
 .giftb.open .gbox{animation:popc .6s ease-out forwards}
 .ov.wel{background:#06040ef7}
+.missec{font-size:19px;margin-top:6px;line-height:1.3}.misbtn{border:0;background:var(--deep);color:var(--ink);font-family:var(--body);font-size:18px;padding:2px 8px;margin:3px 4px 0 0;box-shadow:0 0 0 2px var(--line2);cursor:pointer}
 </style>
 </head>
 <body>
@@ -1377,6 +1378,12 @@ let resetArm=false;
 function vTaller(){
   const cs=SC(tallerPage);
   return `<div class="sec">
+  ${(()=>{const miss=CARDS.filter(c=>!S.imgs[c.id]),covs=SECTIONS.map((x,i)=>i).filter(i=>!S.imgs[covId(i)]),ok=CARDS.length-miss.length;
+    return `<div class="box"><div class="lbl">Revisor de fotos</div>
+    <div class="row" style="align-items:flex-end;margin-top:6px"><div class="big">${ok}<span class="muted" style="font-size:20px">/${CARDS.length}</span></div><div class="muted" style="flex:1">láminas con foto</div></div>
+    <div class="prog" style="--pc:var(--grn);margin:8px 0 10px"><i style="width:${ok/CARDS.length*100}%"></i></div>
+    ${miss.length?`<div class="lbl" style="color:var(--yel)">Faltan ${miss.length}:</div>${SECTIONS.map((x,i)=>{const m=miss.filter(c=>c.page===i);return m.length?`<div class="missec"><b style="color:${x.c}">${esc(x.t)}</b> · ${m.map(c=>`<button class="misbtn" data-tview="${c.id}">#${String(c.num).padStart(3,'0')} ${esc(cname(c))}</button>`).join('')}</div>`:'';}).join('')}`:'<div style="font-size:22px;color:var(--grn)">✔ ¡Todas las láminas tienen foto!</div>'}
+    <div class="muted" style="margin-top:10px">${covs.length?`Portadas sin foto (${covs.length}): ${covs.map(i=>esc(SECTIONS[i].t)).join(', ')}. Son opcionales: sin portada se ven tus mejores láminas.`:'✔ Todas las secciones tienen portada.'}</div></div>`;})()}
   <div class="box"><div class="lbl">Jugar como (para probar)</div><div class="row" style="margin-top:10px">
     ${WHO.map(w=>`<button class="btn ${me===w?'':'ghost'} sm" data-as="${w}">${esc(nm(w).toUpperCase())}</button>`).join('')}</div></div>
   <div class="box"><div class="lbl">Nombres que se muestran</div><div class="row" style="margin-top:10px">
@@ -1844,7 +1851,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='34';
+const APP_VERSION='35';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
