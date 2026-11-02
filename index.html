@@ -510,6 +510,21 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .card .art.ph{background-size:cover,100% 100%,100% 100%,100% 100%;background-position:center}
 
 .aist{font-size:17px;color:var(--yel);min-height:1em}
+
+/* cinta del nombre: metal de la rareza */
+.card{--tx:#1c1e2a}
+.card.rR{--tx:#08183d}.card.rB{--tx:#2a0842}.card.rL{--tx:#3a2400}
+.card .nm{position:relative;overflow:hidden;background:linear-gradient(180deg,#ffffff 0%,var(--f1) 22%,color-mix(in srgb,var(--f1) 45%,var(--f2)) 60%,var(--f2) 100%);
+  box-shadow:inset 0 0 0 .8cqw var(--f3),inset 0 1.6cqw 0 #ffffff88,inset 0 -1.4cqw 0 #00000030}
+.card .nm span{color:var(--tx);text-shadow:0 .55cqw 0 #ffffff99,0 -.25cqw 0 #00000026;position:relative;z-index:1}
+.card .nm.lg2 span{font-size:10cqw}.card .nm.xl span{font-size:8.4cqw;line-height:.95}
+.card.rL .nm::after,.card.rM .nm::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,#ffffffcc 50%,transparent);transform:skewX(-18deg);animation:nmshine 3.6s ease-in-out infinite}
+@keyframes nmshine{0%,55%{left:-60%}85%,100%{left:130%}}
+.card.rM .nm{background:linear-gradient(90deg,#ff5fd2,#ffd23f,#3fae6a,#4fb8ff,#b866e8,#ff5fd2);background-size:300% 100%;animation:rainbow 5s linear infinite;
+  box-shadow:inset 0 0 0 .8cqw #ffffffcc,inset 0 1.6cqw 0 #ffffff66}
+.card.rM .nm span{color:#fff;text-shadow:.6cqw .6cqw 0 #000,-.3cqw -.3cqw 0 #0008}
+.ov-open main .card .nm::after{animation-play-state:paused}
 </style>
 </head>
 <body>
@@ -1001,13 +1016,14 @@ function sprite(c){
 }
 
 /* ===== Lámina ===== */
+function nmSize(n){const w=Math.max(...n.split(/\s+/).map(x=>x.length));return (n.length>26||w>12)?' xl':(n.length>16||w>9)?' lg2':'';}
 function cardHTML(c,count=0,ovImg){
   const img=ovImg||cimg(c),hol=c.r==='B'||c.r==='L'||c.r==='M',sx=SECTIONS[c.page];
   return `<div class="card r${c.r}${hol?' holo':''}${c.r==='L'||c.r==='M'?' lg':''}${c.r==='M'?' my':''}" style="--pc:${sx.c};--rc:var(--c-${c.r})">
     <div class="cin">
       <div class="top"><span class="cno">${String(c.num).padStart(3,'0')}</span><span class="csec">${esc(sx.t)}</span><span class="gems">${'<i></i>'.repeat(RSTARS[c.r])}</span></div>
       <div class="art${img?' ph':c.lt?' ltr':' spr'}" style="${img?`background-image:url('${img}'),var(--bd)`:c.lt?'':`background-image:url('${sprite(c)}')`}">${!img&&c.lt?`<span class="lt">${esc(c.lt)}</span>`:''}${hol?'<div class="shine"></div>':''}</div>
-      <div class="nm"><span>${esc(cname(c))}</span></div>
+      <div class="nm${nmSize(cname(c))}"><span>${esc(cname(c))}</span></div>
       <div class="rar">${RAR[c.r].n.toUpperCase()}</div>
     </div>
     ${count>1?`<span class="cnt">x${count}</span>`:''}
@@ -1607,7 +1623,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='29';
+const APP_VERSION='30';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
