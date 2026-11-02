@@ -526,6 +526,20 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .card.rM .nm span{color:#fff;text-shadow:.6cqw .6cqw 0 #000,-.3cqw -.3cqw 0 #0008}
 .ov-open main .card .nm::after{animation-play-state:paused}
 .card .nm.sm2 span{font-size:15cqw}
+
+/* misiones y sobres especiales */
+.mis{display:flex;flex-direction:column;gap:10px;box-shadow:0 0 0 3px #e8609a,5px 5px 0 3px #0008}
+.mrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px;background:var(--deep);box-shadow:0 0 0 2px var(--line2)}
+.mrow.done{box-shadow:0 0 0 2px var(--grn);opacity:.85}
+.mtxt{flex:1 1 180px;min-width:0;font-size:22px;line-height:1.05}
+.mact{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.mok{font-family:var(--pix);font-size:9px;color:var(--grn)}
+.mwait{font-size:17px;color:var(--yel)}
+#mistxt{width:100%;min-height:160px;font-family:var(--body);font-size:20px;background:var(--deep);color:var(--ink);border:0;box-shadow:0 0 0 2px var(--line);padding:8px 10px;resize:vertical}
+.spbox{display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 0 0 3px #ff5fd2,0 0 22px 4px #ff5fd266,5px 5px 0 3px #0008;animation:pulseb 1.6s ease-in-out infinite}
+.spic{font-size:26px}.spic.big{font-size:44px}
+.pack.spk{background:linear-gradient(135deg,#ff5fd2 0 25%,#ffd23f 25% 50%,#ff4f7b 50% 75%,#b866e8 75%);box-shadow:0 0 0 4px #fff,0 0 30px 8px #ff5fd288,8px 8px 0 4px #000a}
+.pack.spk .body{gap:8px}.pack.spk .spt{font-size:20px;color:#ffd0e8;line-height:1}
 </style>
 </head>
 <body>
@@ -875,9 +889,42 @@ const rival=d=>d.from===me?d.to:d.from;
 const fmtT=ms=>ms>=999999?'se rindió':(ms/1000).toFixed(2)+' s';
 const prizeLeft=()=>{const pl=P(me);return Math.max(0,DUEL_MAX-(pl.duelDay===today()?(pl.duelCount||0):0));};
 function duelActive(){const d=S.duel;return d&&mine(d)&&(d.status==='invite'||(d.status==='playing'&&!(d.res&&d.res.matias&&d.res.polola)));}
+/* ===== Misiones de pareja ===== */
+const MIS_DEFAULT=['Sáquense una selfie juntos','Jueguen una partida de Mario Kart','Cocinen algo juntos','Vean un capítulo de una serie juntos','Salgan a caminar 20 minutos',
+ 'Escuchen juntos una canción de Pearl Jam','Dense un abrazo de 30 segundos','Díganse 3 cosas que les gustan del otro','Jueguen un juego de mesa','Tomen once juntos',
+ 'Recuerden su primera cita y cuéntensela','Bailen una canción de Chico Trujillo','Hagan una videollamada de al menos 10 minutos','Planeen juntos el próximo panorama','Vean una película de Disney',
+ 'Mándense un audio cariñoso','Jueguen un duelo en la app','Compartan un helado','Hagan un pixel art juntos','Inventen un nombre para su futura casa',
+ 'Regaloneen a Rusia, Nino y Hades','Hagan una lista de 5 lugares a los que quieren viajar','Escríbanse una notita a mano','Coman completos juntos','Vean el atardecer juntos',
+ 'Ordenen juntos algo de la casa','Jueguen Zelda un rato: uno juega y el otro aconseja','Canten una de Ricardo Arjona','Pasen 30 minutos sin celulares','Tómense una foto imitando una lámina del álbum'];
+const MIS_N=2;let misUnsub=null,misDay='',misClaiming=false;
+const misList=()=>{const l=(S.cfg.missions&&S.cfg.missions.length)?S.cfg.missions:MIS_DEFAULT;return l;};
+function misToday(){const l=misList(),r=rng('mis'+today()),idx=[];while(idx.length<Math.min(MIS_N,l.length)){const i=Math.floor(r()*l.length);if(!idx.includes(i))idx.push(i);}return idx.map(i=>l[i]);}
+const misRef=()=>doc(fs,'missions',today());
+function misSub(){if(misDay===today())return;misDay=today();if(misUnsub)misUnsub();S.mis={};
+  misUnsub=onSnapshot(misRef(),x=>{S.mis=x.exists()?x.data():{};misSync();safeRender();},e=>console.warn('mis',e));}
+function misPendingForMe(){const m=(S.mis&&S.mis.m)||{};return Object.values(m).some(v=>v&&v.st==='pend'&&v.by!==me);}
+let misSeen='';
+function misSync(){{const m=(S.mis&&S.mis.m)||{};const k=Object.keys(m).filter(i=>m[i]&&m[i].st==='pend'&&m[i].by!==me).join(',');if(k&&k!==misSeen&&S.ready){toast(nm(other())+' marcó una misión. ¡Confírmala en Juegos!');sfx.rare();}misSeen=k;}const m=(S.mis&&S.mis.m)||{},cl=((S.mis&&S.mis.cl)||{})[me]||{};
+  const todo=Object.keys(m).filter(i=>m[i]&&m[i].st==='done'&&!cl[i]);
+  if(!todo.length||misClaiming)return;misClaiming=true;
+  (async()=>{try{const cls={};todo.forEach(i=>cls[i]=true);await setDoc(misRef(),{cl:{[me]:cls}},{merge:true});
+    await patchPlayer(me,{packs:(P(me).packs||0)+todo.length,misDone:(P(me).misDone||0)+todo.length});
+    sfx.fan();Cats.party();toast(`¡Misión cumplida! +${todo.length} sobre${todo.length>1?'s':''}`);}catch(e){console.warn(e);}misClaiming=false;})();}
+async function misSet(i,v){try{await setDoc(misRef(),{m:{[i]:v}},{merge:true});}catch(e){toast('No se pudo guardar la misión');}}
+function misionesHTML(){
+  misSub();const list=misToday(),m=(S.mis&&S.mis.m)||{},o=other();
+  return `<div class="box mis"><div class="lbl">Misiones de pareja · hoy</div>
+  ${list.map((t,i)=>{const v=m[i]||{};let act;
+    if(v.st==='done')act=`<span class="mok">✔ CUMPLIDA</span>`;
+    else if(v.st==='pend'&&v.by===me)act=`<span class="mwait">Esperando que ${esc(nm(o))} confirme</span><button class="btn ghost sm" data-mundo="${i}">DESHACER</button>`;
+    else if(v.st==='pend')act=`<span class="mwait">${esc(nm(v.by))} dice que la hicieron</span><button class="btn sm" data-mok="${i}">CONFIRMAR</button><button class="btn ghost sm" data-mundo="${i}">TODAVÍA NO</button>`;
+    else act=`<button class="btn red sm" data-mdo="${i}">¡LA HICIMOS!</button>`;
+    return `<div class="mrow${v.st==='done'?' done':''}"><div class="mtxt">${v.st==='done'?'⭐':'💌'} ${esc(t)}</div><div class="mact">${act}</div></div>`;}).join('')}
+  <div class="muted" style="font-size:17px;margin-top:8px">Uno la marca y el otro la confirma. Cada misión cumplida: +1 sobre para cada uno. Se renuevan cada día.</div></div>`;
+}
 function vJuegos(){
   const d=S.duel,pl=P(me),o=other(),coins=pl.coins||0,left=prizeLeft();
-  let banner='';
+  let banner=misionesHTML();
   if(d&&mine(d)){
     if(d.status==='invite'&&d.to===me)banner=`<div class="box duelban"><div class="lbl">¡Te retaron!</div><div style="font-size:26px;margin:6px 0 12px">${esc(nm(d.from))} te reta a ${GAMES[d.game].ic} ${GAMES[d.game].n}</div>
       <div class="row"><button class="btn" id="dacc">ACEPTAR Y JUGAR</button><button class="btn ghost" id="drej">AHORA NO</button></div></div>`;
@@ -1057,8 +1104,9 @@ const TABC={album:'#3b6fe0',sobres:'#e0483e',juegos:'#b04ad8',cambios:'#1fa37a',
 function navR(){
   const pend=S.trades.filter(t=>t.status==='pending'&&t.to===me).length;
   const daily=P(me).lastDaily!==today();
-  const du=S.duel,duDot=du&&(du.from===me||du.to===me)&&((du.status==='invite'&&du.to===me)||(du.status==='playing'&&!(du.res&&du.res[me])))?'!':'';
-  const items=[['album','ÁLBUM'],['sobres','SOBRES',daily?'!':''],['juegos','JUEGOS',duDot],['cambios','CAMBIOS',pend||''],['marcador',owner?'PUNTOS':'MARCADOR']];
+  const misDot=misPendingForMe()?'!':'';
+  const du=S.duel,duDot=misDot||du&&(du.from===me||du.to===me)&&((du.status==='invite'&&du.to===me)||(du.status==='playing'&&!(du.res&&du.res[me])))?'!':'';
+  const items=[['album','ÁLBUM'],['sobres','SOBRES',(daily||spPending())?'!':''],['juegos','JUEGOS',duDot],['cambios','CAMBIOS',pend||''],['marcador',owner?'PUNTOS':'MARCADOR']];
   if(owner)items.push(['taller','TALLER']);
   const h=items.map(([k,l,d])=>`<button data-tab="${k}" style="--tc:${TABC[k]}" aria-current="${tab===k}">${l}${d?`<span class="dot">${d}</span>`:''}</button>`).join('');
   if(h!==navHtml){navHtml=h;$('nav').innerHTML=h;$('nav').classList.toggle('n6',items.length>5);}
@@ -1077,12 +1125,12 @@ function render(){hdr();navR();BG.tint(tab==='album'&&sec>=0?SECTIONS[sec].c:(TA
   const mm=$('main'),html=({album:vAlbum,sobres:vSobres,juegos:vJuegos,cambios:vCambios,marcador:vMarcador,taller:vTaller}[tab]||vAlbum)();
   if(!animNext){
     if(html===mainHtml)return;                       /* nada cambió: no se toca la pantalla */
-    const wait=animUntil-Date.now();                 /* hay una animación en curso: esperar a que termine */
+    const wait=animUntil-performance.now();                 /* hay una animación en curso: esperar a que termine */
     if(wait>0){clearTimeout(lateT);lateT=setTimeout(render,wait+30);return;}
     mm.classList.remove('anim','animg');
   }
   mainHtml=html;mm.innerHTML=html;
-  if(animNext){mm.classList.remove('anim','animg');void mm.offsetWidth;mm.classList.add(animNext==='grid'?'animg':'anim');animUntil=Date.now()+(animNext==='grid'?800:1300);clearTimeout(lateT);
+  if(animNext){mm.classList.remove('anim','animg');void mm.offsetWidth;mm.classList.add(animNext==='grid'?'animg':'anim');animUntil=performance.now()+(animNext==='grid'?800:1300);clearTimeout(lateT);
     if(animNext===true&&tab==='album'&&sec<0){const bn=mm.querySelector('.bn');if(bn)roll(bn,0,+bn.textContent,v=>v,700);}}
   animNext=false;
   bind();
@@ -1144,7 +1192,7 @@ function flipRender(){
   const lb=mm.querySelector('.pagehd .lbl'),nl=t.content.querySelector('.pagehd .lbl');if(lb&&nl)lb.textContent=nl.textContent;
   const od=mm.querySelector('.dots'),nd=t.content.querySelector('.dots');if(od&&nd)od.replaceWith(nd);
   ng.classList.add('gin');g.replaceWith(ng);
-  mainHtml=html;mm.classList.remove('anim','animg');animUntil=Date.now()+450;clearTimeout(lateT);
+  mainHtml=html;mm.classList.remove('anim','animg');animUntil=performance.now()+450;clearTimeout(lateT);
   hdr();navR();bind();
 }
 function flip(d){const before=sec;const np=Math.ceil(SC(sec).length/PER_PAGE);spg+=d;
@@ -1157,6 +1205,9 @@ function vSobres(){
   const pl=P(me),daily=pl.lastDaily!==today(),ot=openedToday(me),d=dups(me);
   const canOpen=(pl.packs||0)>0&&ot<cap();
   return `<div class="sec">
+  ${(()=>{const sp=spPending();return sp?`<div class="box spbox"><div class="spic big">${sp.ic}</div><div style="flex:1;min-width:0"><div class="lbl">Hoy es ${esc(sp.t)}</div>
+    <div style="font-size:24px;margin-top:4px">¡Tienes un sobre especial!</div><div class="muted" style="font-size:17px">40% de chance de su mítica, si no, legendaria segura. No cuenta en el tope diario.</div></div>
+    <button class="btn red" id="spopen">ABRIR</button></div>`:'';})()}
   <div class="vend">
     <div class="vmarq"><span>TIENDA DE SOBRES</span></div>
     <div class="vwin">${(pl.packs||0)>0?Array.from({length:Math.min(pl.packs,8)},(_,i)=>`<div class="minipack" style="animation-delay:${-i*.37}s"></div>`).join(''):'<span class="vempty">AGOTADO</span>'}</div>
@@ -1249,6 +1300,8 @@ function vTaller(){
     <div class="edl">${cs.map(c=>`<div class="edrow"><button class="mc tv" data-tview="${c.id}" aria-label="Ver ${esc(cname(c))} en grande">${cardHTML(c)}</button>
       <input type="text" id="cn-${c.id}" data-cn="${c.id}" value="${esc(cname(c))}" aria-label="Nombre lámina ${c.num}">
       <label class="btn ghost sm" style="cursor:pointer">${cimg(c)?'CAMBIAR':'FOTO'}<input type="file" accept="image/*" data-up="${c.id}" hidden></label></div>`).join('')}</div></div>
+  <div class="box"><div class="lbl">Misiones de pareja</div><p class="muted" style="margin:6px 0 10px">Una por línea. Cada día salen ${MIS_N} al azar de esta lista.</p>
+    <textarea id="mistxt" rows="8">${esc(misList().join('\n'))}</textarea></div>
   <div class="box"><div class="lbl">Tema de colores</div><p class="muted" style="margin:6px 0 0">Cambia los colores de toda la app para los dos.</p>
     <div class="skins">${SKINS.map(([k,n,c])=>`<button class="skin" data-skin="${k}" aria-pressed="${(S.cfg.skin||'noche')===k}"><i>${c.map(x=>`<b style="background:${x}"></b>`).join('')}</i>${n}</button>`).join('')}</div></div>
   <div class="box"><div class="lbl">Canción de fondo</div>
@@ -1266,6 +1319,20 @@ function vTaller(){
 
 /* ===== Acciones ===== */
 function draw(){const r=Math.random()*100;let acc=0,k='C';for(const x of ['M','L','B','R','C']){acc+=RAR[x].p;if(r<acc){k=x;break;}}const l=BYR[k];return l[Math.floor(Math.random()*l.length)];}
+const SPECIAL=[{md:'08-24',t:'Cumpleaños de Mati',ic:'🎂',card:'Cumpleaños de Mati'},{md:'10-29',t:'Cumpleaños de Marcelita',ic:'🎂',card:'Cumpleaños de Marcelita'},{md:'11-02',t:'Nuestro aniversario',ic:'💞',card:'Nuestro aniversario'}];
+const todaySpecial=()=>SPECIAL.find(x=>x.md===today().slice(5));
+const spPending=()=>{const sp=todaySpecial();return sp&&!((P(me).sp||{})[today()])?sp:null;};
+function openSpecial(){
+  const sp=spPending();if(!sp)return;
+  const pl=P(me),owned={...(pl.owned||{})},upd={},drawn=[],before=PAGES.map((_,i)=>pageDone(me,i));
+  const my=CARDS.find(c=>c.r==='M'&&c.dn===sp.card);
+  const first=(my&&Math.random()<.4)?my:BYR.L[Math.floor(Math.random()*BYR.L.length)];
+  const add=c=>{const was=owned[c.id]||0;drawn.push({c,isNew:was===0});owned[c.id]=was+1;upd[c.id]=owned[c.id];};
+  add(first);for(let i=1;i<PER_PACK;i++)add(draw());
+  const done=SECTIONS.map((_,i)=>i).filter(i=>before[i]<SC(i).length&&SC(i).every(c=>owned[c.id]));
+  patchPlayer(me,{owned:upd,sp:{[today()]:true},opened:(pl.opened||0)+1});
+  showPack(drawn,done,sp);
+}
 function openPack(){
   const pl=P(me);if((pl.packs||0)<1||openedToday(me)>=cap())return;
   const owned={...(pl.owned||{})},upd={},drawn=[],before=PAGES.map((_,i)=>pageDone(me,i));
@@ -1274,9 +1341,9 @@ function openPack(){
   patchPlayer(me,{owned:upd,packs:(pl.packs||1)-1,openedDay:today(),openedToday:openedToday(me)+1,opened:(pl.opened||0)+1});
   showPack(drawn,done);
 }
-function showPack(drawn,done){
+function showPack(drawn,done,sp){
   const ov=$('ov'),inn=$('ovin');ov.hidden=false;ov.className='ov';document.body.classList.add('ov-open');
-  inn.innerHTML=`<div class="pack" id="pk"><div class="strip"><i id="pkst"></i></div><div class="body"><div class="pix">NUESTRO<br>ÁLBUM<br>RETRO</div><div class="muted">${PER_PACK} láminas</div></div></div>
+  inn.innerHTML=`<div class="pack${sp?' spk':''}" id="pk"><div class="strip"><i id="pkst"></i></div><div class="body">${sp?`<div class="spic">${sp.ic}</div><div class="pix">SOBRE<br>ESPECIAL</div><div class="spt">${esc(sp.t)}</div>`:`<div class="pix">NUESTRO<br>ÁLBUM<br>RETRO</div><div class="muted">${PER_PACK} láminas</div>`}</div></div>
     <div class="hint">DESLIZA O TOCA<br>PARA ABRIR</div>`;
   const pk=$('pk'),st=$('pkst');let prog=0,sx=null,gone=false;
   const setP=v=>{prog=Math.min(1,v);st.style.width=prog*100+'%';if(prog>=1)torn();};
@@ -1544,6 +1611,11 @@ function bind(){
   const on=(id,fn)=>{const el=$(id);if(el)el.onclick=fn;};
   on('open',()=>{ac();sfx.blip();openPack();});on('daily',claimDaily);on('swap',swapDups);on('redeem',redeem);on('propose',propose);on('mkcode',mkCode);on('reset',doReset);
   on('logout',()=>{signOut(auth);});
+  on('spopen',()=>{ac();sfx.blip();openSpecial();});
+  m.querySelectorAll('[data-mdo]').forEach(b=>b.onclick=()=>{sfx.ok();misSet(b.dataset.mdo,{st:'pend',by:me,at:Date.now()});});
+  m.querySelectorAll('[data-mok]').forEach(b=>b.onclick=()=>{misSet(b.dataset.mok,{st:'done',ok:me,at:Date.now()});});
+  m.querySelectorAll('[data-mundo]').forEach(b=>b.onclick=()=>{sfx.blip();misSet(b.dataset.mundo,{st:null,by:null});});
+  {const mt=$('mistxt');if(mt)mt.oninput=()=>debounced('mis',()=>{const l=mt.value.split('\n').map(x=>x.trim()).filter(Boolean);patchCfg({missions:l});});}
   m.querySelectorAll('[data-retar]').forEach(b=>b.onclick=()=>duelInvite(b.dataset.retar));
   on('dacc',duelAccept);on('drej',async()=>{try{await updateDoc(duelRef(),{status:'cancelled'});}catch(e){}});
   on('dcan',async()=>{try{await updateDoc(duelRef(),{status:'cancelled'});}catch(e){}});
@@ -1576,7 +1648,7 @@ function renderTitle(){
   $('tfan').innerHTML=[0,1,2].map(i=>`<div class="tcard t${i}">${best[i]?cardHTML(best[i]):'<div class="back">?</div>'}</div>`).join('');
   if(!S.ready){$('tstat').textContent='Cargando tu colección…';return;}
   const daily=P(me).lastDaily!==today();
-  $('tstat').innerHTML=`<b>¡Hola, ${esc(nm(me))}!</b><span>${uniq(me)}/${CARDS.length} láminas · ${P(me).packs||0} sobre${(P(me).packs||0)===1?'':'s'}</span>${daily?'<span class="tgift">¡TIENES TU REGALO DIARIO!</span>':''}`;
+  $('tstat').innerHTML=`<b>¡Hola, ${esc(nm(me))}!</b><span>${uniq(me)}/${CARDS.length} láminas · ${P(me).packs||0} sobre${(P(me).packs||0)===1?'':'s'}</span>${(()=>{const sp=todaySpecial();return sp?`<span class="tgift">${sp.ic} ¡HOY ES ${esc(sp.t.toUpperCase())}!${spPending()?' TIENES UN SOBRE ESPECIAL':''}</span>`:'';})()}${daily?'<span class="tgift">¡TIENES TU REGALO DIARIO!</span>':''}`;
 }
 $('tstart').onclick=()=>{ac();sfx.fan();$('title').hidden=true;$('app').hidden=false;Cats.show();tab=P(me).lastDaily!==today()?'sobres':'album';sec=-1;animNext=true;render();scrollTo(0,0);if(musicOn)Music.start();};
 
@@ -1624,7 +1696,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='31';
+const APP_VERSION='32';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
