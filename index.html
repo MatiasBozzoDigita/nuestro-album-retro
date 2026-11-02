@@ -1720,7 +1720,12 @@ async function doReset(){
   if(!resetArm){resetArm=true;render();setTimeout(()=>{if(resetArm){resetArm=false;if(tab==='taller')render();}},5000);return;}
   resetArm=false;
   try{await Promise.all(WHO.map(w=>q('p'+w,()=>setDoc(doc(fs,'players',w),def()))));
-    for(const t of S.trades)await deleteDoc(doc(fs,'trades',t.id));toast('Progreso reiniciado');}catch(e){toast('No se pudo reiniciar');}
+    for(const t of S.trades)await deleteDoc(doc(fs,'trades',t.id));
+    await deleteDoc(doc(fs,'duels','current')).catch(()=>{});
+    const yd=new Date(Date.now()-864e5).toLocaleDateString('en-CA'),tm=new Date(Date.now()+864e5).toLocaleDateString('en-CA');
+    for(const d of [yd,today(),tm])await deleteDoc(doc(fs,'missions',d)).catch(()=>{});
+    S.duel=null;S.mis={};G=null;
+    toast('Progreso reiniciado: álbumes, sobres, cambios, duelos, misiones y medallas en cero');}catch(e){toast('No se pudo reiniciar');}
 }
 /* Fotos: se comprimen en el celular (máx. 400 px de ancho) y se guardan en la base de datos */
 /* ===== Fotos: filtro pixel 8-bit con vista previa ===== */
@@ -1982,7 +1987,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='40';
+const APP_VERSION='41';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
