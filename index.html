@@ -551,6 +551,28 @@ nav button[aria-current="true"]{animation:navon .3s steps(3)}
 .medal .md{font-size:15px;line-height:1;color:var(--mute)}
 .medal .prog{height:8px;margin-top:4px}
 .medal .mv{font-family:var(--pix);font-size:7px;color:var(--mute)}
+
+/* bienvenida */
+#weltxt{width:100%;min-height:150px;font-family:var(--body);font-size:20px;background:var(--deep);color:var(--ink);border:0;box-shadow:0 0 0 2px var(--line);padding:8px 10px;resize:vertical}
+.envl{position:relative;width:min(280px,72vw);aspect-ratio:3/2;border:0;padding:0;background:#f6e7c8;box-shadow:0 0 0 4px #8a5a2b,8px 8px 0 4px #0009;cursor:pointer;overflow:visible;animation:float 2.2s ease-in-out infinite}
+.envl::before{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent 49.5%,#e8d3ad 50%) left/50% 100% no-repeat,linear-gradient(to top left,transparent 49.5%,#e8d3ad 50%) right/50% 100% no-repeat}
+.envl .flap{position:absolute;left:0;right:0;top:0;height:58%;background:#ead6b0;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .5s;box-shadow:inset 0 -2px 0 #c9ad7f;z-index:2}
+.envl.open .flap{transform:rotateX(180deg)}
+.envl .seal{position:absolute;left:50%;top:50%;transform:translate(-50%,-30%);z-index:3;width:44px;height:44px;border-radius:50%;background:#d6304f;color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #a01d38}
+.envl.open .seal{opacity:0;transition:opacity .3s}
+.envl .ento{position:absolute;left:0;right:0;bottom:12px;font-size:22px;color:#6b4423;z-index:3}
+.letter{width:100%;max-width:440px;background:#fbf3e2;color:#3a2a1a;padding:22px 20px 18px;box-shadow:0 0 0 4px #8a5a2b,8px 8px 0 4px #0009;background-image:repeating-linear-gradient(180deg,transparent 0 27px,#e3cfa8 27px 28px);cursor:pointer;animation:cin .5s ease-out}
+.letter .lhd{font-family:var(--pix);font-size:11px;color:#c0304f;text-align:center;margin-bottom:12px}
+.letter .ltx{font-size:24px;line-height:1.15;white-space:pre-wrap;min-height:6em}
+.letter .lsg{font-size:24px;text-align:right;margin-top:12px;color:#8a1f45}
+.tut{width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;animation:cin .35s ease-out}
+.tut .tic{font-size:54px}.tut .tt{font-size:12px;color:var(--yel)}.tut p{margin:0;font-size:22px;line-height:1.15}
+.wdots{display:flex;gap:8px;justify-content:center}.wdots i{width:10px;height:10px;background:var(--line2)}.wdots i.on{background:var(--yel)}
+.giftb{position:relative;width:180px;height:180px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.giftb .gbox{font-size:110px;position:relative;z-index:1;animation:chestwob 1.6s ease-in-out infinite}
+.giftb .rays{opacity:1;animation:spin 6s linear infinite;width:220px;height:220px;margin:-110px 0 0 -110px}
+.giftb.open .gbox{animation:popc .6s ease-out forwards}
+.ov.wel{background:#06040ef7}
 </style>
 </head>
 <body>
@@ -1368,6 +1390,9 @@ function vTaller(){
     <div class="edl">${cs.map(c=>`<div class="edrow"><button class="mc tv" data-tview="${c.id}" aria-label="Ver ${esc(cname(c))} en grande">${cardHTML(c)}</button>
       <input type="text" id="cn-${c.id}" data-cn="${c.id}" value="${esc(cname(c))}" aria-label="Nombre lámina ${c.num}">
       <label class="btn ghost sm" style="cursor:pointer">${cimg(c)?'CAMBIAR':'FOTO'}<input type="file" accept="image/*" data-up="${c.id}" hidden></label></div>`).join('')}</div></div>
+  <div class="box"><div class="lbl">Bienvenida para ${esc(nm('polola'))}</div><p class="muted" style="margin:6px 0 10px">Se le muestra una sola vez, la primera vez que entre: tu carta, un tutorial corto y ${WELCOME_GIFT} sobres de regalo.${P('polola').welcomed?' <b style="color:var(--grn)">Ya la vio.</b>':''}</p>
+    <textarea id="weltxt" rows="7" placeholder="Escribe aquí tu mensaje…">${esc((S.cfg.welcome&&S.cfg.welcome)||WELCOME_DEFAULT)}</textarea>
+    <div class="row" style="margin-top:10px"><button class="btn sm" id="welprev">VER VISTA PREVIA</button>${P('polola').welcomed?'<button class="btn ghost sm" id="welagain">MOSTRÁRSELA DE NUEVO</button>':''}</div></div>
   <div class="box"><div class="lbl">Misiones de pareja</div><p class="muted" style="margin:6px 0 10px">Una por línea. Cada día salen ${MIS_N} al azar de esta lista.</p>
     <textarea id="mistxt" rows="8">${esc(misList().join('\n'))}</textarea></div>
   <div class="box"><div class="lbl">Tema de colores</div><p class="muted" style="margin:6px 0 0">Cambia los colores de toda la app para los dos.</p>
@@ -1436,7 +1461,7 @@ function showPack(drawn,done,sp){
 }
 function celebrate(done){if(done&&done.length){setTimeout(()=>{sfx.fan();Fx.fireworks(done.some(i=>SECTIONS[i].letters));Cats.party();(done.some(i=>SECTIONS[i].letters)?toast('♥ T E  A M O ♥  ¡Completaste la sección más importante!'):toast('¡SECCIÓN COMPLETA! '+done.map(i=>SECTIONS[i].t).join(' · ')));},250);}}
 function closeOv(){if(tiltOff){tiltOff();tiltOff=null;}const ov=$('ov');ov.hidden=true;ov.className='ov';$('ovin').innerHTML='';$('ovin').className='ovin';document.body.classList.remove('ov-open');if(dirty){dirty=false;render();}}
-$('ov').addEventListener('click',e=>{if(e.target.id==='ov'&&!$('pk')&&!document.querySelector('.fc')&&!G)closeOv();});
+$('ov').addEventListener('click',e=>{if(e.target.id==='ov'&&!$('pk')&&!document.querySelector('.fc')&&!G&&!WEL)closeOv();});
 
 /* ===== Visor 3D de lámina ===== */
 let tiltOff=null;
@@ -1683,6 +1708,9 @@ function bind(){
   m.querySelectorAll('[data-mdo]').forEach(b=>b.onclick=()=>{sfx.ok();misSet(b.dataset.mdo,{st:'pend',by:me,at:Date.now()});});
   m.querySelectorAll('[data-mok]').forEach(b=>b.onclick=()=>{misSet(b.dataset.mok,{st:'done',ok:me,at:Date.now()});});
   m.querySelectorAll('[data-mundo]').forEach(b=>b.onclick=()=>{sfx.blip();misSet(b.dataset.mundo,{st:null,by:null});});
+  {const wt=$('weltxt');if(wt)wt.oninput=()=>debounced('wel',()=>patchCfg({welcome:wt.value}));}
+  on('welprev',()=>{const wt=$('weltxt');if(wt)S.cfg.welcome=wt.value;welcomeFlow(true);});
+  on('welagain',()=>{patchPlayer('polola',{welcomed:false});toast('Listo: la verá la próxima vez que entre');});
   {const mt=$('mistxt');if(mt)mt.oninput=()=>debounced('mis',()=>{const l=mt.value.split('\n').map(x=>x.trim()).filter(Boolean);patchCfg({missions:l});});}
   m.querySelectorAll('[data-retar]').forEach(b=>b.onclick=()=>duelInvite(b.dataset.retar));
   on('dacc',duelAccept);on('drej',async()=>{try{await updateDoc(duelRef(),{status:'cancelled'});}catch(e){}});
@@ -1718,7 +1746,59 @@ function renderTitle(){
   const daily=P(me).lastDaily!==today();
   $('tstat').innerHTML=`<b>¡Hola, ${esc(nm(me))}!</b><span>${uniq(me)}/${CARDS.length} láminas · ${P(me).packs||0} sobre${(P(me).packs||0)===1?'':'s'}</span>${(()=>{const sp=todaySpecial();return sp?`<span class="tgift">${sp.ic} ¡HOY ES ${esc(sp.t.toUpperCase())}!${spPending()?' TIENES UN SOBRE ESPECIAL':''}</span>`:'';})()}${daily?'<span class="tgift">¡TIENES TU REGALO DIARIO!</span>':''}`;
 }
-$('tstart').onclick=()=>{ac();sfx.fan();$('title').hidden=true;$('app').hidden=false;Cats.show();tab=P(me).lastDaily!==today()?'sobres':'album';sec=-1;animNext=true;render();scrollTo(0,0);if(musicOn)Music.start();};
+$('tstart').onclick=()=>{ac();sfx.fan();$('title').hidden=true;$('app').hidden=false;Cats.show();tab=P(me).lastDaily!==today()?'sobres':'album';sec=-1;animNext=true;render();scrollTo(0,0);if(musicOn)Music.start();
+  if(realMe==='polola'&&S.ready&&!P('polola').welcomed)setTimeout(()=>welcomeFlow(false),500);};
+
+/* ===== Bienvenida para Marcelita ===== */
+const WELCOME_GIFT=5;
+const WELCOME_DEFAULT='Hice este álbum pensando en ti, en nosotros y en todo lo que nos gusta.\n\nCada lámina es un pedacito de nuestra historia, y quiero que lo llenemos juntos, sobre a sobre.\n\nTe amo.';
+let WEL=false;
+const TUT=[
+ ['📚','Tu álbum','Son 300 láminas repartidas en 17 secciones: Zelda, bandas, comidas, nosotros, nuestros gatos y mucho más. Toca un cartucho para entrar a su sección.'],
+ ['🎁','Sobres','Cada día te espera un cofre con 2 sobres. Cada sobre trae 5 láminas. Desliza el dedo para rasgarlo y toca las láminas para darlas vuelta.'],
+ ['💎','Rarezas','Común, rara, brillante, legendaria… y las 3 míticas, que son nuestras fechas especiales. El brillo del reverso te avisa cuando viene algo bueno.'],
+ ['⚔️','Juegos y misiones','Reta a Mati a duelos de reflejos o memorice, y cumplan juntos las misiones del día. Todo eso da más sobres.'],
+ ['🤝','Cambios y medallas','Intercambia tus repetidas con Mati en la mesa de cambios y gana medallas por todo lo que logres. ¡A completar el álbum!']];
+function welcomeFlow(preview){
+  WEL=true;const from=nm('matias'),to=nm('polola');let step=-1;
+  const msg=(S.cfg.welcome&&S.cfg.welcome.trim())||WELCOME_DEFAULT;
+  const dotsH=i=>`<div class="wdots">${TUT.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div>`;
+  const close=()=>{WEL=false;closeOv();};
+  // 1) sobre con la carta
+  ovShow(`<div class="ovtitle pix">¡BIENVENIDA, ${esc(to.toUpperCase())}!</div>
+    <button class="envl" id="envl" aria-label="Abrir la carta"><span class="flap"></span><span class="seal">❤</span><span class="ento">Para: ${esc(to)}</span></button>
+    <div class="hint">TOCA EL SOBRE<br>PARA ABRIRLO</div>`);
+  $('ov').classList.add('wel');
+  $('envl').onclick=()=>{ac();sfx.flip();$('envl').classList.add('open');setTimeout(letter,650);};
+  function letter(){
+    ovShow(`<div class="letter"><div class="lhd">♥ Para ${esc(to)} ♥</div><div class="ltx" id="ltx"></div><div class="lsg" id="lsg" hidden>— ${esc(from)}</div></div>
+      <button class="btn" id="lnext" hidden>CONTINUAR</button><div class="hint" id="lskip" style="animation:none">TOCA LA CARTA PARA VERLA COMPLETA</div>`);
+    const el=$('ltx');let i=0,done=false;
+    const finish=()=>{done=true;el.textContent=msg;$('lsg').hidden=false;$('lnext').hidden=false;$('lskip').hidden=true;};
+    const tick=()=>{if(done)return;i++;el.textContent=msg.slice(0,i);if(i%3===0&&msg[i-1]!==' ')tone(900+Math.random()*200,.025,0,'square',.02);if(i>=msg.length)return finish();setTimeout(tick,msg[i-1]==='\n'?220:32);};
+    setTimeout(tick,400);
+    document.querySelector('.letter').onclick=()=>{if(!done)finish();};
+    $('lnext').onclick=()=>{sfx.blip();step=0;tut();};
+  }
+  // 2) tutorial
+  function tut(){
+    const [ic,t,d]=TUT[step];
+    ovShow(`<div class="ovtitle pix">CÓMO SE JUEGA · ${step+1}/${TUT.length}</div>
+      <div class="box tut"><div class="tic">${ic}</div><div class="tt pix">${esc(t.toUpperCase())}</div><p>${esc(d)}</p></div>${dotsH(step)}
+      <div class="row">${step>0?'<button class="btn ghost" id="tback">ATRÁS</button>':''}<button class="btn" id="tnext">${step<TUT.length-1?'SIGUIENTE':'¡ENTENDIDO!'}</button></div>`);
+    if($('tback'))$('tback').onclick=()=>{sfx.blip();step--;tut();};
+    $('tnext').onclick=()=>{sfx.blip();if(step<TUT.length-1){step++;tut();}else gift();};
+  }
+  // 3) regalo
+  function gift(){
+    ovShow(`<div class="ovtitle pix">UN REGALO PARA EMPEZAR</div><button class="giftb" id="giftb" aria-label="Abrir regalo"><span class="rays"></span><span class="gbox">🎁</span></button>
+      <div class="hint">TOCA EL REGALO</div>`);
+    $('giftb').onclick=async()=>{const b=$('giftb');if(b.classList.contains('open'))return;b.classList.add('open');sfx.fan();Cats.party();Fx.fireworks(false);if(navigator.vibrate)navigator.vibrate([60,40,120]);
+      if(!preview){try{await patchPlayer(me,{welcomed:true,packs:(P(me).packs||0)+WELCOME_GIFT});}catch(e){}}
+      setTimeout(()=>{ovShow(`<div class="ovtitle pix gold">¡+${WELCOME_GIFT} SOBRES!</div><div class="box" style="width:100%;text-align:center"><div style="font-size:26px">Tus sobres de bienvenida ya están en la tienda.</div><p class="muted">${preview?'(Vista previa: no se entregaron sobres)':'¡Ábrelos y empieza tu colección!'}</p></div>
+        <button class="btn red" id="wgo">¡A JUGAR!</button>`);$('wgo').onclick=()=>{close();if(!preview){tab='sobres';sec=-1;animNext=true;render();scrollTo(0,0);}};},900);};
+  }
+}
 
 /* ===== Inicio de sesión ===== */
 $('loginform').addEventListener('submit',async e=>{
@@ -1764,7 +1844,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='33';
+const APP_VERSION='34';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
