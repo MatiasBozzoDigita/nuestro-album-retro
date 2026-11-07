@@ -1381,7 +1381,11 @@ function vSobres(){
 
 /* ===== Vista: Cambios ===== */
 function vCambios(){
-  const o=other(),myD=CARDS.filter(c=>cnt(me,c.id)>1),thD=CARDS.filter(c=>cnt(o,c.id)>1);
+  const o=other(),myAll=CARDS.filter(c=>cnt(me,c.id)>1),thAll=CARDS.filter(c=>cnt(o,c.id)>1);
+  /* Solo se muestran repetidas que le sirven al otro: las que ya tiene se ocultan */
+  const myD=myAll.filter(c=>!cnt(o,c.id)),thD=thAll.filter(c=>!cnt(me,c.id));
+  if(tGive&&!myD.some(c=>c.id===tGive))tGive=null;if(tWant&&!thD.some(c=>c.id===tWant))tWant=null;
+  const hid=(n,txt)=>n?`<p class="muted" style="margin-top:6px;font-size:11px">${n} oculta${n>1?'s':''}: ${txt}</p>`:'';
   const inc=S.trades.filter(t=>t.status==='pending'&&t.to===me),out=S.trades.filter(t=>t.status==='pending'&&t.from===me);
   const hist=S.trades.filter(t=>t.status!=='pending').slice(0,8);
   const tr=(t,btns)=>{const g=CBY[t.give],w=CBY[t.want];return `<div class="box trade">
@@ -1391,10 +1395,10 @@ function vCambios(){
   const pk=(list,sel,attr,who)=>list.length?`<div class="minis">${list.map(c=>`<button class="pick" ${attr}="${c.id}" aria-pressed="${sel===c.id}">${cardHTML(c,cnt(who,c.id))}</button>`).join('')}</div>`:'';
   return `<div class="sec">
   ${inc.length?`<div class="lbl">Te proponen</div>${inc.map(t=>tr(t,`<button class="btn sm" data-acc="${t.id}">ACEPTAR</button><button class="btn ghost sm" data-rej="${t.id}">RECHAZAR</button>`)).join('')}`:''}
-  <div class="mesa"><div class="mesatit">MESA DE INTERCAMBIO</div><p class="mesasub">Elige una repetida tuya y una repetida de ${esc(nm(o))}.</p>
+  <div class="mesa"><div class="mesatit">MESA DE INTERCAMBIO</div><p class="mesasub">Solo aparecen las repetidas que le faltan al otro.</p>
     <div class="split">
-      <div><div class="plate" style="--pc:${me==='matias'?'var(--blu)':'#e8609a'}">${esc(nm(me).toUpperCase())} DA</div>${pk(myD,tGive,'data-give',me)||'<p class="empty">Aún no tienes repetidas.</p>'}</div>
-      <div><div class="plate" style="--pc:${o==='matias'?'var(--blu)':'#e8609a'}">${esc(nm(o).toUpperCase())} DA</div>${pk(thD,tWant,'data-want',o)||`<p class="empty">${esc(nm(o))} no tiene repetidas todavía.</p>`}</div>
+      <div><div class="plate" style="--pc:${me==='matias'?'var(--blu)':'#e8609a'}">${esc(nm(me).toUpperCase())} DA</div>${pk(myD,tGive,'data-give',me)||`<p class="empty">${myAll.length?`${esc(nm(o))} ya tiene todas tus repetidas.`:'Aún no tienes repetidas.'}</p>`}${myD.length?hid(myAll.length-myD.length,`${esc(nm(o))} ya las tiene.`):''}</div>
+      <div><div class="plate" style="--pc:${o==='matias'?'var(--blu)':'#e8609a'}">${esc(nm(o).toUpperCase())} DA</div>${pk(thD,tWant,'data-want',o)||`<p class="empty">${thAll.length?`Ya tienes todas las repetidas de ${esc(nm(o))}.`:`${esc(nm(o))} no tiene repetidas todavía.`}</p>`}${thD.length?hid(thAll.length-thD.length,'tú ya las tienes.'):''}</div>
     </div>
     <div class="row" style="margin-top:14px"><button class="btn" id="propose" ${tGive&&tWant?'':'disabled'}>ENVIAR PROPUESTA</button></div></div>
   ${out.length?`<div class="lbl">Esperando respuesta</div>${out.map(t=>tr(t,`<button class="btn ghost sm" data-can="${t.id}">CANCELAR</button>`)).join('')}`:''}
@@ -1987,7 +1991,7 @@ onAuthStateChanged(auth,user=>{
   $('login').hidden=true;$('app').hidden=true;$('title').hidden=false;renderTitle();render();startAll();
 });
 
-const APP_VERSION='42';
+const APP_VERSION='43';
 if('serviceWorker' in navigator){
   const had=!!navigator.serviceWorker.controller;let reloaded=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload();}});
